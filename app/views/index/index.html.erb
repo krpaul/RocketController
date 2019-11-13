@@ -1,2 +1,43 @@
-<h1>Index#index</h1>
-<p>Find me in app/views/index/index.html.erb</p>
+<div class="row">
+    <div class="col-sm">
+        <h1 class="altitude">
+            <span id="alt">0</span> km
+        </h1>
+        <h5>
+            Heading: <span id="heading">0</span>
+        </h5>
+    </div>
+    <div class="col-sm">
+        Video Stream
+    </div>
+    <div class="col-sm ll-col">
+        <div class="lat-lng">
+            <div class="col-sm">
+                Lat: <span id="lat">0.00000 </span>
+            </div>
+            <div class="col-sm">
+                Lng: <span id="lng">0.00000 </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm">
+        <div id="altGraph" width="auto" height="auto"></div>
+    </div>
+    <div class="col-sm">
+    </div>
+    <div class="col-sm">
+        <div id="map"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm">
+        <h4>Last RSSI: <span id="rssi">nil</span></h4>
+        <h4>Last SNR: <span id="snr">nil</span></h4>
+    </div>
+    <div class="col-sm">
+    </div>
+    <div class="col-sm">
+    </div>
+</div>

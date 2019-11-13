@@ -13,3 +13,53 @@
  *= require_tree .
  *= require_self
  */
+
+body
+{
+    font-family: 'Montserrat', Arial, sans-serif;
+    margin: 5em;
+}
+
+.altitude
+{
+    font-size: 3em;
+    color: darkslateblue;
+    border: 2px solid black;
+    padding: 1em;
+    max-width: 75%;
+    text-align: center;
+    margin: auto;
+    margin-bottom: 0.5em;
+}
+
+.col-sm
+{
+    /* border: 1px solid red; */
+    text-align: center
+}
+
+
+.lat-lng
+{
+    font-size: 2em;
+    font-weight: 900;
+    font-family: "Open Sans", sans-serif;
+}
+
+.ll-col
+{
+    margin-top: 3em;
+}
+
+#altGraph
+{
+    margin-top: 1em;
+    height: 25em;
+    width: auto;
+}
+
+#map 
+{
+    height: 40em; 
+    width:auto; 
+}

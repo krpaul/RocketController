@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
   get 'index/index'
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  get '/telemetry', to: "index#checkForTelemetryUpdate"
+  get '/telemetry/all', to: "index#allTelemetry"
+  get '/reset', to: "index#resetDB"
+
+  root 'index#index'
 end
