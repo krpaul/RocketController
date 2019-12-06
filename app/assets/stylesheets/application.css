@@ -18,48 +18,79 @@ body
 {
     font-family: 'Montserrat', Arial, sans-serif;
     margin: 5em;
+    background-color: black;
 }
 
-.altitude
-{
-    font-size: 3em;
-    color: darkslateblue;
-    border: 2px solid black;
-    padding: 1em;
-    max-width: 75%;
-    text-align: center;
-    margin: auto;
-    margin-bottom: 0.5em;
 }
 
-.col-sm
-{
-    /* border: 1px solid red; */
-    text-align: center
-}
-
-
-.lat-lng
-{
-    font-size: 2em;
-    font-weight: 900;
-    font-family: "Open Sans", sans-serif;
-}
-
-.ll-col
-{
-    margin-top: 3em;
-}
 
 #altGraph
 {
-    margin-top: 1em;
     height: 25em;
     width: auto;
 }
 
+.bordered
+{
+    border: 2px solid white;
+}
+
+.row
+{
+    margin-top: 3rem;
+}
+
+.col-lg
+{
+    margin-left: 3rem;
+    margin-right: 3rem;
+    padding-top: 5em;
+    padding-bottom:5rem;
+    text-align: center;
+    position: relative;
+}
+
+.col-lg span
+{
+    font-size: 5em;
+    color: white;
+}
+
+.col-lg .slightly-smaller
+{
+    font-size: 1.5em;
+    color: white;
+}
+
+
+.col-lg .header
+{
+    background: black;
+    color: lightgreen;
+    
+    font-weight: 900;
+    font-size: 1.25em;
+    
+    position: absolute;
+    top: -1em;
+    left: 3em;
+    
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+#video-stream
+{
+    height: 17em;
+}
+
 #map 
 {
-    height: 40em; 
-    width:auto; 
+    height: 17em; 
+}
+
+.small-padding
+{
+    padding-top: 1em;
+    padding-bottom: 1em;
 }

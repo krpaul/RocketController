@@ -8,6 +8,7 @@ class IndexController < ApplicationController
     end
 
     def checkForTelemetryUpdate
+        return
         aiokey = "d8e82ee635f343aa9a6790ecb1049899"; feedkey = "raw-telemetry-string"; limit = 1
 
         url = URI.parse("http://io.adafruit.com/api/feeds/" + feedkey + "/data.json?X-AIO-Key=" + aiokey + "&limit=" + limit.to_s)
