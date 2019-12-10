@@ -1,0 +1,2 @@
+class Telemetry < ApplicationRecord
+end

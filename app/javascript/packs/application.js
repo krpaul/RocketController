@@ -15,11 +15,6 @@ require("channels")
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
 
-Date.prototype.addHours = function(h){
-    this.setHours(this.getHours()+h);
-    return this;
-}
-
 Array.prototype.last = function() {
     return this.slice(-1)[0]
 }
@@ -34,6 +29,124 @@ let altitudePoints = []
 let latlngPairs = []
 let chart
 let currMarker
+
+let timestampLastUpdate = Infinity
+
+
+function newData(data)
+{
+    
+    if (!data // if data does not exist
+        || data == undefined // or is not of the form we want
+        || data.timestamp <= timestampLastUpdate // or is not new
+    )
+    {
+        return // Don't do anything
+    }
+
+    /* Otherwise ... */
+
+    // Update latest time
+    timestampLastUpdate = data.timestamp
+
+    // Update numerical data
+    $("#altitude-value")[0].innerText = data.altitude
+    $("#latitude-value")[0].innerText = data.latitude
+    $("#longitude-value")[0].innerText = data.longitude
+
+    // Add pair to lines
+    latlngPairs.push([data.latitude, data.longitude])
+
+    // Add altitude
+    altitudePoints.push(data.altitude)
+
+    // Update map
+    map.jumpTo({
+        center: latlngPairs.last(),
+        zoom: 2,
+    })
+
+    // Add a line to the map
+    addMapLines(latlngPairs)
+
+    // Update Altitude Chart
+    createAltChart()
+}
+
+function checkDataUpdate() {
+    $.ajax(
+        {
+            url: "/out",
+            success: newData,
+        }
+    )    
+}
+
+
+$(document).ready(function() {
+    // Create map
+    map = new mapboxgl.Map({
+        container: 'map', // HTML container ID
+        style: 'mapbox://styles/mapbox/streets-v9', // style URL
+        center: [0, 0], 
+        zoom: 5
+    })
+
+    map.on('load', 
+        function() {
+            // Create altitude chart
+            createAltChart()
+
+            // Let the window check for an update every 5 seconds with new data
+            window.setInterval(checkDataUpdate, 5000);
+        }
+    )
+})
+
+
+/*******************
+    Utility Methods 
+*******************/
+
+// `lines` is an array of [lat, lng] pairs
+function addMapLines(lines)
+{
+    // Quick and dirty approach to this function:
+    // deleting and recreating the layer each time, 
+    // but works for now
+
+    if (map.getLayer('route')) 
+    {
+        map.removeLayer('route')
+        map.removeSource('route')
+    }
+
+    map.addLayer(
+        {
+            "id": "route",
+            "type": "line",
+            "source": {
+                "type": "geojson",
+                "data": {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": lines
+                    }
+                }
+            },
+            "layout": {
+                "line-join": "round",
+                "line-cap": "round"
+            },
+            "paint": {
+                "line-color": "#F00",
+                "line-width": 2
+            }
+        }
+    )  
+}
 
 function createAltChart() 
 {
@@ -56,133 +169,3 @@ function createAltChart()
     });
     chart.render();
 }
-
-function updateInfo(data, jqXHR, textStatus)
-{
-    if (data == undefined) return
-
-    $("#lat")[0].innerText = data.latitude
-    $("#lng")[0].innerText = data.longitude
-    $("#alt")[0].innerText =  data.altitude
-    $("#rssi")[0].innerText = data.last_rssi
-    $("#snr")[0].innerText =  data.last_snr
-    $("#heading")[0].innerText =  data.heading
-
-    var llPair = [data.latitude, data.longitude]
-    latlngPairs.push(llPair)
-
-    map.jumpTo(
-        {center: llPair, zoom: 5}
-    )
-    addMapLines()
-
-    if (currMarker) currMarker.remove()
-    currMarker = new mapboxgl.Marker()
-    .setLngLat(llPair)
-    .addTo(map);
-    
-    var t = new Date().getTime() / 1000;
-    altitudePoints.push({x: new Date(data.db_time * 1000), y: parseInt(data.altitude)})
-    
-    createAltChart()
-}
-
-function checkDataUpdate() {
-    $.ajax({
-        type: "GET", 
-        url: "/telemetry",
-        success: updateInfo,
-        error: function(jqXHR, textStatus, errorThrown) {}
-    })
-}
-
-function addMapLines()
-{
-    if (map.getLayer('route')) 
-    {
-        map.removeLayer('route')
-        map.removeSource('route')
-    }
-
-    map.addLayer(
-        {
-            "id": "route",
-            "type": "line",
-            "source": {
-                "type": "geojson",
-                "data": {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": "LineString",
-                        "coordinates": latlngPairs
-                    }
-                }
-            },
-            "layout": {
-                "line-join": "round",
-                "line-cap": "round"
-            },
-            "paint": {
-                "line-color": "#F00",
-                "line-width": 2
-            }
-        }
-    )  
-}
-
-function initPage(data, a, b)
-{
-    initialData = data
-    if (data.length == 0) return
-
-    // Only creating arrays to track things that are graphed over time
-    for (const stream of initialData)
-    {
-        altitudePoints.push(
-            {x: new Date(stream.db_time * 1000), y: parseInt(stream.altitude)}
-        )
-            
-        latlngPairs.push([stream.latitude, stream.longitude])
-    }
-        
-    
-    map = new mapboxgl.Map({
-        container: 'map', // HTML container ID
-        style: 'mapbox://styles/mapbox/streets-v9', // style URL
-        center: latlngPairs.last(), // starting position as [lng, lat]
-        zoom: 4
-    });
-
-    map.on('load', 
-        function() {
-            // Add lines
-            addMapLines()
-
-            // Fill all data
-            updateInfo(initialData.last())
-            
-            // Create altitude chart
-            createAltChart()
-
-            // Look for updates
-            window.setInterval(checkDataUpdate, 2000);
-        }
-    )
-
-}
-
-$(document).ready(
-    function()
-    {
-        while (initialData.length == 0)
-            // Get all data points
-            $.ajax({
-                type: "GET", 
-                url: "/telemetry/all",
-                success: initPage,
-                error: function(jqXHR, textStatus, errorThrown) {},
-                async: false
-            })
-    }
-);
