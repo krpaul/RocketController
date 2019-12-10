@@ -41,6 +41,7 @@ function newData(data)
         || data.timestamp <= timestampLastUpdate // or is not new
     )
     {
+        console.log('a')
         return // Don't do anything
     }
 
@@ -50,27 +51,39 @@ function newData(data)
     timestampLastUpdate = data.timestamp
 
     // Update numerical data
-    $("#altitude-value")[0].innerText = data.altitude
-    $("#latitude-value")[0].innerText = data.latitude
-    $("#longitude-value")[0].innerText = data.longitude
+    var alt = parseFloat(data.altitude)
+    var lat = parseFloat(data.latitude)
+    var lng = parseFloat(data.longitude)
+
+    $("#altitude-value")[0].innerText  = alt.toFixed(2)
+    $("#latitude-value")[0].innerText  = lat.toFixed(2)
+    $("#longitude-value")[0].innerText = lng.toFixed(2)
+
+    console.log(data.timestamp, parseFloat(data.timestamp))
 
     // Add pair to lines
-    latlngPairs.push([data.latitude, data.longitude])
+    latlngPairs.push([lat, lng])
 
     // Add altitude
-    altitudePoints.push(data.altitude)
+    altitudePoints.push(alt)
 
     // Update map
     map.jumpTo({
         center: latlngPairs.last(),
-        zoom: 2,
+        zoom: 3,
     })
 
     // Add a line to the map
     addMapLines(latlngPairs)
 
     // Update Altitude Chart
-    createAltChart()
+    // chart.data[0].addTo("dataPoints", altitudePoints.last())
+    // chart.options.data[0].dataPoints[length-1].y = altitudePoints.last()
+    
+    chart.options.data[0].dataPoints.push({ y: altitudePoints.last(), x: data.timestamp})
+    chart.render()
+
+    // createAltChart()
 }
 
 function checkDataUpdate() {
@@ -150,7 +163,28 @@ function addMapLines(lines)
 
 function createAltChart() 
 {
-    chart = new CanvasJS.Chart("altGraph", {
+    // chart = new CanvasJS.Chart("altGraph", {
+    //     axisX: {
+    //         title: "Time"
+    //     },
+    //     axisY: {
+    //         title: "Meters",
+    //         suffix: "m"
+    //     },
+    //     data: [{
+    //         type: "line",
+    //         name: "Altitude",
+    //         xValueType: "dateTime",
+    //         xValueFormatString: "D/M hh:mm TT",
+    //         yValueFormatString: "# ##0.##\"m\"",
+    //         dataPoints: altitudePoints
+    //     }]
+    // });
+
+    chart = new CanvasJS.Chart("altGraph", { 
+		title: {
+			text: "Altitude Over This Flight"
+        },
         axisX: {
             title: "Time"
         },
@@ -158,14 +192,19 @@ function createAltChart()
             title: "Meters",
             suffix: "m"
         },
-        data: [{
-            type: "line",
-            name: "Altitude",
-            xValueType: "dateTime",
-            xValueFormatString: "D/M hh:mm TT",
-            yValueFormatString: "# ##0.##\"m\"",
-            dataPoints: altitudePoints
-        }]
-    });
+		data: [
+            {
+                type: "line",
+                // xValueType: "dateTime",
+                // xValueFormatString: "D/M hh:mm TT",
+                dataPoints: [
+                    // { y: 10, x: 1001},
+                    // { y:  4, x: 1002},
+                    // { y: 18, x: 1003},
+                    // { y:  8, x: 1005}	
+                ]
+            }
+		]
+	});
     chart.render();
 }

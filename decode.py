@@ -3,13 +3,15 @@ from time import sleep
 import requests as r
 
 def main():
-    endpoint = "http://localhost:5000/in"
+    endpoint = "http://localhost:4000/in"
 
-    lat = randint(4400, 5500) / 100
-    lng = randint(-11500, -9000) / 100
+    lat = randint(44*100, 55*100) / 100
+    lng = randint(-110*100, -70*100) / 100
     alt = randint(1000, 2000)
     gps_quality = 1
     horizontal_dil = 1.2 # horizontal dilution of precision
+
+    print(lat, lng)
 
     while True:
         # construct data
@@ -35,7 +37,6 @@ def main():
         horizontal_dil += randint(-10, 10) / 10
 
         sleep(5)
-
 
 if __name__ == "__main__":
     main()

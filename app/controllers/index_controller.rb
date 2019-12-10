@@ -12,7 +12,7 @@ class IndexController < ApplicationController
             :altitude => t_obj.altitude,
             :gps_quality => t_obj.gps_quality,
             :hdop => t_obj.hdop,
-            :timestamp => t_obj.created_at,
+            :timestamp => t_obj.created_at.to_time.to_i,
         }
     end
 
