@@ -10,10 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_11_221305) do
+ActiveRecord::Schema.define(version: 2019_12_06_180242) do
 
-  create_table "data_streams", force: :cascade do |t|
-    t.text "stream"
+  create_table "telemetries", force: :cascade do |t|
+    t.float "latitude"
+    t.float "longitude"
+    t.float "altitude"
+    t.integer "gps_quality"
+    t.float "hdop"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

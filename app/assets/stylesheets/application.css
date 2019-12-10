@@ -17,16 +17,13 @@
 body
 {
     font-family: 'Montserrat', Arial, sans-serif;
-    margin: 5em;
+    margin: 3em;
     background-color: black;
 }
 
-}
-
-
 #altGraph
 {
-    height: 25em;
+    height: 15em;
     width: auto;
 }
 
@@ -40,30 +37,29 @@ body
     margin-top: 3rem;
 }
 
-.col-lg
+[class*='col-lg']
 {
-    margin-left: 3rem;
-    margin-right: 3rem;
+    margin-left: 2em;
+    margin-right: 2em;
     padding-top: 5em;
-    padding-bottom:5rem;
+    padding-bottom: 5em;
     text-align: center;
     position: relative;
 }
 
-.col-lg span
+[class*='col-lg'] span
 {
-    font-size: 5em;
+    font-size: 3em;
     color: white;
 }
 
-.col-lg .slightly-smaller
+[class*='col-lg'] .slightly-smaller
 {
     font-size: 1.5em;
     color: white;
 }
 
-
-.col-lg .header
+[class*='col-lg'] .header
 {
     background: black;
     color: lightgreen;
@@ -81,16 +77,31 @@ body
 
 #video-stream
 {
-    height: 17em;
+    height: 20em;
 }
 
 #map 
 {
-    height: 17em; 
+    height: 27em; 
 }
 
 .small-padding
 {
     padding-top: 1em;
     padding-bottom: 1em;
+}
+
+.small-padding-sides
+{
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.small-value
+{
+    color: white;
+    font-size: 2em;
+
+    padding-top: 0;
+    padding-bottom: 0;
 }

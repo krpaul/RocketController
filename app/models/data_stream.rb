@@ -1,2 +1,0 @@
-class DataStream < ApplicationRecord
-end
