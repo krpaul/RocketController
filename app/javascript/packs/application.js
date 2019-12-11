@@ -24,24 +24,21 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoia3JwYXVsIiwiYSI6ImNrMnV4b2w5dTFhbnQzaG50Ymppc
 
 // Global vars
 let map
-let initialData = []
+let initialMapData = []
 let altitudePoints = []
 let latlngPairs = []
 let chart
-let currMarker
+let timer
 
-let timestampLastUpdate = Infinity
-
+let timestampLastUpdate = 0
 
 function newData(data)
 {
-    
     if (!data // if data does not exist
         || data == undefined // or is not of the form we want
         || data.timestamp <= timestampLastUpdate // or is not new
     )
     {
-        console.log('a')
         return // Don't do anything
     }
 
@@ -59,19 +56,11 @@ function newData(data)
     $("#latitude-value")[0].innerText  = lat.toFixed(2)
     $("#longitude-value")[0].innerText = lng.toFixed(2)
 
-    console.log(data.timestamp, parseFloat(data.timestamp))
-
     // Add pair to lines
     latlngPairs.push([lat, lng])
 
     // Add altitude
     altitudePoints.push(alt)
-
-    // Update map
-    map.jumpTo({
-        center: latlngPairs.last(),
-        zoom: 3,
-    })
 
     // Add a line to the map
     addMapLines(latlngPairs)
@@ -80,28 +69,62 @@ function newData(data)
     // chart.data[0].addTo("dataPoints", altitudePoints.last())
     // chart.options.data[0].dataPoints[length-1].y = altitudePoints.last()
     
+    map.jumpTo({
+        center: [lat, lng]
+    })
+    
     chart.options.data[0].dataPoints.push({ y: altitudePoints.last(), x: data.timestamp})
     chart.render()
 
-    // createAltChart()
+    resetTimeSinceLastUpdate()
+}
+
+function allData(data) // Fills in all data packets from /all request
+{
+    console.log()
+    
+    if (!data)
+        return
+
+    data.forEach(packet => {
+        // Extract numerical data
+        var alt = parseFloat(packet.altitude)
+        var lat = parseFloat(packet.latitude)
+        var lng = parseFloat(packet.longitude)
+        
+        
+        // Insert into arrays
+        initialMapData.push({y: alt, x: packet.timestamp})
+        altitudePoints.push(alt)
+        latlngPairs.push([lat, lng])
+    })
+
+    var last = data.last()
+
+    map.jumpTo({
+        center: [last.latitude, last.longitude]
+    })
 }
 
 function checkDataUpdate() {
-    $.ajax(
-        {
-            url: "/out",
-            success: newData,
-        }
-    )    
+    $.ajax({
+        url: "/out",
+        success: newData,
+    })    
 }
 
-
 $(document).ready(function() {
+    // Get all data
+    $.ajax({
+        url: "/all",
+        success: allData,
+    }) 
+
     // Create map
     map = new mapboxgl.Map({
         container: 'map', // HTML container ID
         style: 'mapbox://styles/mapbox/streets-v9', // style URL
-        center: [0, 0], 
+        center: [0,0], // [initialMapData.last().latitude, initialMapData.last().longitude], 
         zoom: 5
     })
 
@@ -112,8 +135,18 @@ $(document).ready(function() {
 
             // Let the window check for an update every 5 seconds with new data
             window.setInterval(checkDataUpdate, 5000);
+
         }
     )
+
+    // Set button events
+    setElements()
+    
+    // Timer
+    resetTimeSinceLastUpdate()
+
+    // Last time update (and remove credit)
+    window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
 })
 
 
@@ -163,48 +196,111 @@ function addMapLines(lines)
 
 function createAltChart() 
 {
-    // chart = new CanvasJS.Chart("altGraph", {
-    //     axisX: {
-    //         title: "Time"
-    //     },
-    //     axisY: {
-    //         title: "Meters",
-    //         suffix: "m"
-    //     },
-    //     data: [{
-    //         type: "line",
-    //         name: "Altitude",
-    //         xValueType: "dateTime",
-    //         xValueFormatString: "D/M hh:mm TT",
-    //         yValueFormatString: "# ##0.##\"m\"",
-    //         dataPoints: altitudePoints
-    //     }]
-    // });
-
     chart = new CanvasJS.Chart("altGraph", { 
-		title: {
-			text: "Altitude Over This Flight"
-        },
         axisX: {
-            title: "Time"
+            title: "Time",
+            labelFormatter: formatUnixTime
         },
         axisY: {
             title: "Meters",
             suffix: "m"
         },
-		data: [
-            {
-                type: "line",
-                // xValueType: "dateTime",
-                // xValueFormatString: "D/M hh:mm TT",
-                dataPoints: [
-                    // { y: 10, x: 1001},
-                    // { y:  4, x: 1002},
-                    // { y: 18, x: 1003},
-                    // { y:  8, x: 1005}	
-                ]
-            }
-		]
-	});
+        toolTip: {
+            contentFormatter: toolTipFormatter
+        },
+		data: [{
+            type: "line",
+            dataPoints: initialMapData
+        }],
+    });
+    
     chart.render();
+}
+
+function formatUnixTime(args, mode=0) 
+/*
+    mode=0 -> HH:MM
+    mode=1 -> MM:SS
+*/
+{
+    if (!args) return
+
+    // If given as part of an object, or as just the value
+    var value = args.value || args
+    
+    var date = new Date(value * 1000)
+
+    switch (mode)
+    {
+        default: 
+        case 0: 
+            return `${date.getHours()}h ${date.getMinutes()}m`
+        case 1:
+            return `${date.getMinutes()}m ${date.getSeconds()}s`
+    }
+}
+
+function toolTipFormatter(e)
+{
+    var content = "";
+    for (var i = 0; i < e.entries.length; i++) {
+
+        // Create html for this tooltip entry
+        var current = 
+            `<strong>
+            ${formatUnixTime(e.entries[i].dataPoint.x, mode=1)}
+            </strong>, 
+            ${e.entries[i].dataPoint.y}m`
+        
+        // Append to overarching string
+        content += current + "<br />"
+    }
+    return content
+}
+
+function updateTimeSinceLastUpdate()
+{
+    timer.innerText = String(parseInt(timer.innerText) + 1)
+}
+
+function resetTimeSinceLastUpdate()
+{
+    timer.innerText = "0"
+}
+
+/*******************
+    Button Methods 
+*******************/
+
+function _resetZoom()
+{
+    map.jumpTo({
+        zoom: 3,
+    })
+}
+
+function _goTo()
+{
+    map.jumpTo({
+        center: latlngPairs.last() || [0, 0]
+    })
+}
+
+// Remove canvasJS credit
+function removeCredit()
+{
+    if ($(".canvasjs-chart-credit")[0])
+        $(".canvasjs-chart-credit")[0].remove()
+}
+
+function setElements()
+{
+    $("#reset-zoom").click(_resetZoom)
+    
+    $("#go-to-balloon").click(function() {
+        _goTo()
+        _resetZoom()
+    })
+
+    timer = $("#last-update")[0]
 }

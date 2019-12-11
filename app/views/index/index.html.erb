@@ -1,37 +1,44 @@
 <div class="row">
-    <div class="col-lg bordered">
-        <span class="header">Altitude / Lat / Lng</span>
+    <div class="col-lg bordered no-bottom">
+        <span class="header green">General Telemetry</span>
         <span id="altitude-value">0</span> <span class="slightly-smaller">m</span>
         <br />
         <span id="latitude-value">0</span> <span class="slightly-smaller">* N</span>
         <br />
         <span id="longitude-value">0</span> <span class="slightly-smaller">* W</span>
         <br />
+        <span class="slightly-smaller small-padding">Last Update: <span class="slightly-smaller" id="last-update">0</span> s</span> 
     </div>
     <div class="col-lg bordered small-padding">
-        <span class="header">Video Stream</span>
-        <img id="video-stream" src="assets/images/testimg.png" />
+        <span class="header purple">Video Stream</span>
+        <img id="video-stream" src="http://hd.wallpaperswide.com/thumbs/earth_sunrise_from_space-t2.jpg" />
     </div>
     <div class="col-lg bordered small-padding">
-        <span class="header">Global Position</span>
+        <span class="header orange">Global Position</span>
         <div id="map"></div>
+        <button class="map-button" id="reset-zoom">Reset Zoom</button >
+        <button class="map-button" id="go-to-balloon">Go To Balloon</button >
     </div>
 </div>
 
 <div class="row">
     <div class="col-lg bordered small-padding">
-        <span class="header">Misc. Data</span>
-        <div id="altGraph" width="auto" height="17em"></div>
+        <span class="header blue">Altitude Graph</span>
+        <div id="altGraph" width="auto" height=20em></div>
     </div>
-    <div class="col-lg bordered">
-        <span class="header">Controls</span>
+    <div class="col-lg bordered small-padding">
+        <span class="header red">Controls</span>
+        <div class="control-buttons">
+            <button type="button" class="btn btn-danger">Launch Rocket</button>
+            <br />
+            <button type="button" class="btn btn-warning">Play Sound</button>
+            <br />
+            <button type="button" class="btn btn-success">Blink LED</button>
+            <br />
+        </div>
+        <button class="authorize-button btn-primary btn-lg btn-block">Authorize</button>
     </div>
-    <div class="col-lg bordered">
-        <span class="header">Controls</span>
+    <div class="col-lg bordered small-padding">
+        <span class="header yellow">Stuff Idk</span>
     </div>
-    <!-- <div class="col-lg bordered small-padding">
-        <span class="header">Lat/Lng</span>
-        <div class="small-value" id="latitude-value">51.21312</div>
-        <div class="small-value" id="longitude-value">-144.274415</div>
-    </div> -->
 </div>

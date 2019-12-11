@@ -62,7 +62,7 @@ class IndexController < ApplicationController
     end
 
     # returns the whole database
-    def all
+    def allData
         return render json: Telemetry.all.map {|s| hashTelemData(s) }
     end
 
@@ -71,5 +71,4 @@ class IndexController < ApplicationController
         Telemetry.delete_all
         return redirect_to '/'
     end
-
 end

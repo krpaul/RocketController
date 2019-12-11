@@ -31,8 +31,12 @@ def main():
 
         # randomize data
         lat += randint(0, 100) / 100
+        lat %= 90
+
         lng += randint(0, 100) / 100
-        alt += randint(0, 15) / 100
+        lng %= 90
+
+        alt += randint(0, 15) 
         gps_quality += randint(1, 4)
         horizontal_dil += randint(-10, 10) / 10
 
