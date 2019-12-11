@@ -14,6 +14,8 @@
  *= require_self
  */
 
+$vertical-padding: 5em;
+
 body
 {
     font-family: 'Montserrat', Arial, sans-serif;
@@ -21,10 +23,16 @@ body
     background-color: black;
 }
 
+
 #altGraph
 {
-    height: 15em;
+    height: 20em;
     width: auto;
+    & {
+        display: -ms-flex; 
+        display: -webkit-flex;
+        display: flex; 
+    }
 }
 
 .bordered
@@ -37,12 +45,24 @@ body
     margin-top: 3rem;
 }
 
+.map-button
+{
+    color: blue;
+    margin-top: 0.5em;
+    margin-bottom: 0;
+}
+
+.no-bottom
+{
+    padding-bottom: 0 !important;
+}
+
 [class*='col-lg']
 {
     margin-left: 2em;
     margin-right: 2em;
-    padding-top: 5em;
-    padding-bottom: 5em;
+    padding-top: $vertical-padding;
+    padding-bottom: $vertical-padding;
     text-align: center;
     position: relative;
 }
@@ -53,6 +73,7 @@ body
     color: white;
 }
 
+
 [class*='col-lg'] .slightly-smaller
 {
     font-size: 1.5em;
@@ -62,7 +83,6 @@ body
 [class*='col-lg'] .header
 {
     background: black;
-    color: lightgreen;
     
     font-weight: 900;
     font-size: 1.25em;
@@ -75,9 +95,28 @@ body
     padding-right: 1em;
 }
 
+/* Colours for headers */
+.red
+{ color: rgb(238, 61, 61)  !important; }
+
+.blue
+{ color: lightcyan  !important; }
+
+.green
+{ color: lightgreen  !important; }
+
+.purple
+{ color: rgb(229, 155, 248) !important; }
+
+.orange
+{ color: lightcoral !important; }
+
+/**/
+
 #video-stream
 {
     height: 20em;
+    margin-top: 1em;
 }
 
 #map 
@@ -101,7 +140,25 @@ body
 {
     color: white;
     font-size: 2em;
-
+    
     padding-top: 0;
     padding-bottom: 0;
+}
+
+.control-buttons button
+{
+    background-color: black;
+    margin-top: 2em;
+    color: white
+}
+
+.authorize-button
+{
+    margin-top: 3em;
+    width: 75%;
+    margin-left: 12.5%;
+}
+
+.canvasjs-chart-tooltip{
+    margin-bottom: 20em;
 }

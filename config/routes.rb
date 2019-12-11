@@ -1,11 +1,10 @@
 Rails.application.routes.draw do
   get 'index/index'
-  get '/telemetry', to: "index#checkForTelemetryUpdate"
-  get '/telemetry/all', to: "index#allTelemetry"
-  get '/reset', to: "index#resetDB"
-
+  get '/reset', to: "index#reset"
+  
   post '/in', to: "index#inData"
   get '/out', to: "index#outData"
-
+  get '/all', to: "index#allData"
+  
   root 'index#index'
 end

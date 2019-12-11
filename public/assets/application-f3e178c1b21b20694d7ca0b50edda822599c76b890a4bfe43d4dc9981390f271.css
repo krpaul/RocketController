@@ -1,0 +1,114 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+
+
+ */
+/* line 18, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+body {
+  font-family: 'Montserrat', Arial, sans-serif;
+  margin: 3em;
+  background-color: black;
+}
+
+/* line 25, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+#altGraph {
+  height: 15em;
+  width: auto;
+}
+
+/* line 31, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+.bordered {
+  border: 2px solid white;
+}
+
+/* line 36, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+.row {
+  margin-top: 3rem;
+}
+
+/* line 41, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+.map-button {
+  color: blue;
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+
+/* line 48, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+.no-bottom {
+  padding-bottom: 0em !important;
+}
+
+/* line 53, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+[class*='col-lg'] {
+  margin-left: 2em;
+  margin-right: 2em;
+  padding-top: 5em;
+  padding-bottom: 5em;
+  text-align: center;
+  position: relative;
+}
+
+/* line 63, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+[class*='col-lg'] span {
+  font-size: 3em;
+  color: white;
+}
+
+/* line 70, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+[class*='col-lg'] .slightly-smaller {
+  font-size: 1.5em;
+  color: white;
+}
+
+/* line 76, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+[class*='col-lg'] .header {
+  background: black;
+  color: lightgreen;
+  font-weight: 900;
+  font-size: 1.25em;
+  position: absolute;
+  top: -1em;
+  left: 3em;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+/* line 92, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+#video-stream {
+  height: 20em;
+}
+
+/* line 97, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+#map {
+  height: 27em;
+}
+
+/* line 102, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+.small-padding {
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+/* line 109, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+.small-padding-sides {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+/* line 115, /mnt/c/Users/krpau/Desktop/RocketController/app/assets/stylesheets/application.scss */
+.small-value {
+  color: white;
+  font-size: 2em;
+  padding-top: 0;
+  padding-bottom: 0;
+}
