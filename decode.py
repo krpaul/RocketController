@@ -3,7 +3,7 @@ from time import sleep
 import requests as r
 
 def main():
-    endpoint = "http://localhost:4000/in"
+    endpoint = "http://localhost:3000/in"
 
     lat = randint(44*100, 55*100) / 100
     lng = randint(-110*100, -70*100) / 100
