@@ -1,8 +1,3 @@
-// This file is automatically compiled by Webpack, along with any other files
-// present in this directory. You're encouraged to place your actual application logic in
-// a relevant structure within app/javascript and only use these pack files to reference
-// that code so it'll be compiled.
-
 require("@rails/ujs").start()
 require("turbolinks").start()
 require("@rails/activestorage").start()
@@ -23,14 +18,14 @@ Array.prototype.last = function() {
 mapboxgl.accessToken = 'pk.eyJ1Ijoia3JwYXVsIiwiYSI6ImNrMnV4b2w5dTFhbnQzaG50YmppcHVhdWcifQ.rwTKRa2OQmqweeps8ZXELw';
 
 // Global vars
-let map
-let initialMapData = []
-let altitudePoints = []
-let latlngPairs = []
-let chart
-let timer
+let map;
+let initialMapData = [];
+let altitudePoints = [];
+let latlngPairs = [];
+let chart;
+let timer;
 
-let timestampLastUpdate = 0
+let timestampLastUpdate = 0;
 
 function newData(data)
 {
@@ -48,11 +43,11 @@ function newData(data)
     timestampLastUpdate = data.timestamp
 
     // Update numerical data
-    var alt = parseFloat(data.altitude)
-    var lat = parseFloat(data.latitude)
-    var lng = parseFloat(data.longitude)
+    var alt = parseFloat(data.alt)
+    var lat = parseFloat(data.lat)
+    var lng = parseFloat(data.lng)
 
-    $("#altitude-value")[0].innerText  = alt.toFixed(2)
+    $("#altitude-value")[0].innerText  = alt.toFixed(1)
     $("#latitude-value")[0].innerText  = lat.toFixed(2)
     $("#longitude-value")[0].innerText = lng.toFixed(2)
 
@@ -70,28 +65,53 @@ function newData(data)
     // chart.options.data[0].dataPoints[length-1].y = altitudePoints.last()
     
     map.jumpTo({
-        center: [lat, lng]
+        center: [lng, lat]
     })
     
+    // update chart
     chart.options.data[0].dataPoints.push({ y: altitudePoints.last(), x: data.timestamp})
     chart.render()
 
+    updateGeneralTelemetry(data)
+
+    // reset timer
     resetTimeSinceLastUpdate()
+}
+
+function updateGeneralTelemetry(packet)
+{
+    // update acceleration vect
+    $("#accel-x")[0].innerText = packet.acceleration.x
+    $("#accel-y")[0].innerText = packet.acceleration.y
+    $("#accel-z")[0].innerText = packet.acceleration.z
+    
+    // update orientation
+    $("#orient-x")[0].innerText = packet.orientation.x
+    $("#orient-y")[0].innerText = packet.orientation.y
+    $("#orient-z")[0].innerText = packet.orientation.z
+    
+    // update gryo
+    $("#gyro-x")[0].innerText = packet.gyro.x
+    $("#gyro-y")[0].innerText = packet.gyro.y
+    $("#gyro-z")[0].innerText = packet.gyro.z
+
+    // update calib
+    $("#calib-sys")[0].innerText = packet.calibration.sys
+    $("#calib-mag")[0].innerText = packet.calibration.mag
+    $("#calib-gyro")[0].innerText = packet.calibration.gyro
+    $("#calib-accel")[0].innerText = packet.calibration.accel
 }
 
 function allData(data) // Fills in all data packets from /all request
 {
-    console.log()
-    
     if (!data)
         return
 
     data.forEach(packet => {
         // Extract numerical data
-        var alt = parseFloat(packet.altitude)
-        var lat = parseFloat(packet.latitude)
-        var lng = parseFloat(packet.longitude)
-        
+        var alt = parseFloat(packet.alt)
+        var lat = parseFloat(packet.lat)
+        var lng = parseFloat(packet.lng)
         
         // Insert into arrays
         initialMapData.push({y: alt, x: packet.timestamp})
@@ -99,11 +119,8 @@ function allData(data) // Fills in all data packets from /all request
         latlngPairs.push([lat, lng])
     })
 
-    var last = data.last()
-
-    map.jumpTo({
-        center: [last.latitude, last.longitude]
-    })
+    // fill in gen. telemetry with latest packet
+    updateGeneralTelemetry(data.last())
 }
 
 function checkDataUpdate() {
@@ -113,42 +130,46 @@ function checkDataUpdate() {
     })    
 }
 
-$(document).ready(function() {
+
+document.addEventListener("turbolinks:load", function() { 
     // Get all data
     $.ajax({
         url: "/all",
-        success: allData,
+        success: (data) => {
+
+            // Get all data
+            allData(data)
+
+            // Create map
+            // Note mapbox coord are given at LNG / LAT, not lat/lng
+            map = new mapboxgl.Map({
+                container: 'map', // HTML container ID
+                style: 'mapbox://styles/mapbox/streets-v9', // style URL
+                center: [latlngPairs.last()[1], latlngPairs.last()[0]], 
+                zoom: 5
+            })
+        
+            map.on('load', 
+                function() {
+                    // Create altitude chart
+                    createAltChart()
+        
+                    // Let the window check for an update every hald second with new data
+                    window.setInterval(checkDataUpdate, 500);
+                }
+            )
+        
+            // Set button events
+            setElements()
+            
+            // Timer
+            resetTimeSinceLastUpdate()
+        
+            // Last time update (and remove mapbox credit)
+            window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
+        },
     }) 
-
-    // Create map
-    map = new mapboxgl.Map({
-        container: 'map', // HTML container ID
-        style: 'mapbox://styles/mapbox/streets-v9', // style URL
-        center: [0,0], // [initialMapData.last().latitude, initialMapData.last().longitude], 
-        zoom: 5
-    })
-
-    map.on('load', 
-        function() {
-            // Create altitude chart
-            createAltChart()
-
-            // Let the window check for an update every 5 seconds with new data
-            window.setInterval(checkDataUpdate, 5000);
-
-        }
-    )
-
-    // Set button events
-    setElements()
-    
-    // Timer
-    resetTimeSinceLastUpdate()
-
-    // Last time update (and remove credit)
-    window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
 })
-
 
 /*******************
     Utility Methods 
@@ -264,9 +285,7 @@ function updateTimeSinceLastUpdate()
 }
 
 function resetTimeSinceLastUpdate()
-{
-    timer.innerText = "0"
-}
+{ timer.innerText = "0" }
 
 /*******************
     Button Methods 
