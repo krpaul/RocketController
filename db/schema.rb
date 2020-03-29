@@ -29,7 +29,8 @@ ActiveRecord::Schema.define(version: 2019_12_06_180242) do
     t.integer "calib_MAG"
     t.integer "calib_GYRO"
     t.integer "calib_ACCEL"
-    t.text "rawJSON"
+    t.integer "RSSI"
+    t.string "lastNodeName"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
