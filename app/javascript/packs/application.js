@@ -100,6 +100,10 @@ function updateGeneralTelemetry(packet)
     $("#calib-mag")[0].innerText = packet.calibration.mag
     $("#calib-gyro")[0].innerText = packet.calibration.gyro
     $("#calib-accel")[0].innerText = packet.calibration.accel
+
+    // transmission info
+    $("#last-node")[0].innerText = packet.lastNodeName
+    $("#last-rssi")[0].innerText = packet.RSSI
 }
 
 function allData(data) // Fills in all data packets from /all request

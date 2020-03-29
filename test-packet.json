@@ -1,7 +1,7 @@
 {
-    "lat": 52.4423,
-    "lng": -115.43245,
-    "alt": 4300,
+    "lat": 53.4423,
+    "lng": -105.43245,
+    "alt": 5000,
     "acceleration": {
         "x": 4,
         "y": 2,
@@ -22,5 +22,7 @@
         "gyro": 2, 
         "mag": 3,
         "accel": 2
-    }
+    },
+    "RSSI": "-40",
+    "lastNodeName": "Mobile Node"
 }

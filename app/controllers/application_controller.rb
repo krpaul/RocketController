@@ -1,12 +1,33 @@
 class ApplicationController < ActionController::Base
-    def hashTelemData(t_obj) # converts a DB row into a ruby hash for json-ing
-        # return {
-        #     :latitude => t_obj.latitude,
-        #     :longitude => t_obj.longitude,
-        #     :altitude => t_obj.altitude,
-        #     :gps_quality => t_obj.gps_quality,
-        #     :hdop => t_obj.hdop,
-        # }
-        return Hash.new()
+    def reconstructJSON(db_col)
+        {
+            "lat" => db_col.lat,
+            "lng" => db_col.lng,
+            "alt" => db_col.alt,
+            "acceleration" => {
+                "x" => db_col.accelerationX,
+                "y" => db_col.accelerationY,
+                "z" => db_col.accelerationZ
+            },
+            "orientation" => {
+                "x" => db_col.orientationX,
+                "y" => db_col.orientationY,
+                "z" => db_col.orientationZ
+            },
+            "gyro" => {
+                "y" => db_col.gyroY,
+                "x" => db_col.gyroX,
+                "z" => db_col.gyroZ
+            },
+            "calibration" => {
+                "sys" => db_col.calib_SYS,
+                "accel" => db_col.calib_ACCEL,
+                "gyro" => db_col.calib_GYRO,
+                "mag" => db_col.calib_MAG,
+            },
+            "RSSI": db_col.RSSI,
+            "lastNodeName": db_col.lastNodeName,
+            "timestamp" => db_col.created_at.to_time.to_i # add timestamp
+        }
     end
 end
