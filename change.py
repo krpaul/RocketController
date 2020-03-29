@@ -7,7 +7,7 @@ obj = open(file, "r")
 contents = obj.read()
 obj.close()
 
-NUM_LINES_PER_PACKET = 16
+NUM_LINES_PER_PACKET = 17
 URL = "http://localhost:3000/in"
 
 while True: 
@@ -16,10 +16,16 @@ while True:
 
     diff = new.replace(contents, "")
     if (diff != ""):
-        lines = diff.splitlines()
-
+        lines = filter(lambda line: not (
+            "lora" in line.lower() 
+            or "freq" in line.lower() 
+            or "failed" in line.lower()),
+        diff.splitlines())
+        
         # traverse each packet
         for packet in zip(*(iter(lines),) * NUM_LINES_PER_PACKET):
+            print("packet: ", packet, sep="")
+
             _json = {
                 "lat": packet[0],
                 "lng": packet[1],
@@ -45,6 +51,7 @@ while True:
                     "gyro": packet[14],
                     "mag": packet[15]
                 },
+                "RSSI": packet[16]
             }
 
             requests.post(URL, json=_json)
