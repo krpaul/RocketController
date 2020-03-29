@@ -22,7 +22,8 @@ class CreateTelemetries < ActiveRecord::Migration[6.0]
       t.integer :calib_GYRO
       t.integer :calib_ACCEL
 
-      t.text :rawJSON
+      t.integer :RSSI
+      t.string  :lastNodeName
 
       t.timestamps
     end
