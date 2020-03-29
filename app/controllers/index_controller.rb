@@ -5,48 +5,71 @@ class IndexController < ApplicationController
     skip_before_action :verify_authenticity_token
     $data = nil
 
-    def hashTelemData(t_obj) # converts a DB row into a ruby hash for json-ing
-        return {
-            :latitude => t_obj.latitude,
-            :longitude => t_obj.longitude,
-            :altitude => t_obj.altitude,
-            :gps_quality => t_obj.gps_quality,
-            :hdop => t_obj.hdop,
-            :timestamp => t_obj.created_at.to_time.to_i,
-        }
-    end
-
     def index
     end
 
 =begin
-    Availible Data Should Be:
-    :latitude
-    :longitude
-    :altitude
-    :gps_quality
-        GPS Quality indicator reference: 
-            0 -> Fix not valid
-            1 -> GPS fix
-            2 -> Differential GPS fix, OmniSTAR VBS
-            4 -> Real-Time Kinematic, fixed integers
-            5 -> Real-Time Kinematic, float integers, OmniSTAR XP/HP or Location RTK
-    :hdop
-        Horizontal Dilution of Precision
 =end    
+
+    def reconstructJSON(db_col)
+        {
+            "lat" => db_col.lat,
+            "lng" => db_col.lng,
+            "alt" => db_col.alt,
+            "acceleration" => {
+                "x" => db_col.accelerationX,
+                "y" => db_col.accelerationY,
+                "z" => db_col.accelerationZ
+            },
+            "orientation" => {
+                "x" => db_col.orientationX,
+                "y" => db_col.orientationY,
+                "z" => db_col.orientationZ
+            },
+            "gyro" => {
+                "y" => db_col.gyroY,
+                "x" => db_col.gyroX,
+                "z" => db_col.gyroZ
+            },
+            "calibration" => {
+                "sys" => db_col.calib_SYS,
+                "accel" => db_col.calib_ACCEL,
+                "gyro" => db_col.calib_GYRO,
+                "mag" => db_col.calib_MAG,
+            },
+            "timestamp" => db_col.created_at.to_time.to_i # add timestamp
+        }
+    end
 
     def inData
         # save data in DB
         t = Telemetry.new
-        t.latitude = params[:latitude]
-        t.longitude = params[:longitude]
-        t.altitude = params[:altitude]
-        t.gps_quality = params[:gps_quality]
-        t.hdop = params[:hdop]
-        t.save
+
+        t.lat = params[:lat]
+        t.lng = params[:lng]
+        t.alt = params[:alt]
+
+        t.accelerationX = params[:acceleration][:x]
+        t.accelerationY = params[:acceleration][:y]
+        t.accelerationZ = params[:acceleration][:z]
+
+        t.gyroX = params[:gyro][:x]
+        t.gyroY = params[:gyro][:y]
+        t.gyroZ = params[:gyro][:z]
+
+        t.orientationX = params[:orientation][:x]
+        t.orientationY = params[:orientation][:y]
+        t.orientationZ = params[:orientation][:z]
+
+        t.calib_SYS = params[:calibration][:sys]
+        t.calib_MAG = params[:calibration][:mag]
+        t.calib_GYRO = params[:calibration][:gyro]
+        t.calib_ACCEL = params[:calibration][:accel]
         
-        # set the global data var
-        $data = hashTelemData(t)
+        t.save!
+        
+        # set the global data var json
+        $data = reconstructJSON(t)
     
         return # return no content
     end
@@ -63,7 +86,7 @@ class IndexController < ApplicationController
 
     # returns the whole database
     def allData
-        return render json: Telemetry.all.map {|s| hashTelemData(s) }
+        return render json: Telemetry.all.map {|s| reconstructJSON s }
     end
 
     # clears the database

@@ -14,7 +14,7 @@
  *= require_self
  */
 
-$vertical-padding: 5em;
+$vertical-padding: 1em;
 
 body
 {
@@ -22,7 +22,6 @@ body
     margin: 3em;
     background-color: black;
 }
-
 
 #altGraph
 {
@@ -33,6 +32,11 @@ body
         display: -webkit-flex;
         display: flex; 
     }
+}
+
+.vector-group
+{
+    color: white;
 }
 
 .bordered
@@ -67,17 +71,17 @@ body
     position: relative;
 }
 
-[class*='col-lg'] span
+.under-value
 {
-    font-size: 3em;
     color: white;
+    .slightly-smaller
+    { font-size: 0.75em; }
 }
 
-
-[class*='col-lg'] .slightly-smaller
-{
-    font-size: 1.5em;
-    color: white;
+.last-update
+{ 
+    margin-top: 1.65em; 
+    font-size: 1.35em;
 }
 
 [class*='col-lg'] .header

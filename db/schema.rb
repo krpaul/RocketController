@@ -13,11 +13,23 @@
 ActiveRecord::Schema.define(version: 2019_12_06_180242) do
 
   create_table "telemetries", force: :cascade do |t|
-    t.float "latitude"
-    t.float "longitude"
-    t.float "altitude"
-    t.integer "gps_quality"
-    t.float "hdop"
+    t.float "lat"
+    t.float "lng"
+    t.float "alt"
+    t.float "accelerationX"
+    t.float "accelerationY"
+    t.float "accelerationZ"
+    t.float "gyroX"
+    t.float "gyroY"
+    t.float "gyroZ"
+    t.float "orientationX"
+    t.float "orientationY"
+    t.float "orientationZ"
+    t.integer "calib_SYS"
+    t.integer "calib_MAG"
+    t.integer "calib_GYRO"
+    t.integer "calib_ACCEL"
+    t.text "rawJSON"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

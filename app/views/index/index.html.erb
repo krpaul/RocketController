@@ -1,23 +1,45 @@
 <div class="row">
     <div class="col-lg bordered no-bottom">
         <span class="header green">General Telemetry</span>
-        <span id="altitude-value">0</span> <span class="slightly-smaller">m</span>
-        <br />
-        <span id="latitude-value">0</span> <span class="slightly-smaller">* N</span>
-        <br />
-        <span id="longitude-value">0</span> <span class="slightly-smaller">* W</span>
-        <br />
-        <span class="slightly-smaller small-padding">Last Update: <span class="slightly-smaller" id="last-update">0</span> s</span> 
+        <div class="vector-group">
+            <h4>Acceleration</h4>
+            <h5>X: <span id="accel-x">-</span> (m/s&sup2;)</h5>
+            <h5>Y: <span id="accel-y">-</span> (m/s&sup2;)</h5>
+            <h5>Z: <span id="accel-z">-</span> (m/s&sup2;)</h5>
+        </div>
+        <div class="vector-group">
+            <h4>Orientation</h4>
+            <h5>X: <span id="orient-x">-</span> &deg;</h5>
+            <h5>Y: <span id="orient-y">-</span> &deg;</h5>
+            <h5>Z: <span id="orient-z">-</span> &deg;</h5>
+        </div>
+        <div class="vector-group">
+            <h4>Gyroscopic</h4>
+            <h5>X: <span id="gyro-x">-</span> (deg/s)</h5>
+            <h5>Y: <span id="gyro-y">-</span> (deg/s)</h5>
+            <h5>Z: <span id="gyro-z">-</span> (deg/s)</h5>
+        </div>
     </div>
     <div class="col-lg bordered small-padding">
         <span class="header purple">Video Stream</span>
         <img id="video-stream" src="http://hd.wallpaperswide.com/thumbs/earth_sunrise_from_space-t2.jpg" />
+        
+        <div class="last-update">
+            <span class="under-value slightly-smaller">Last Update: <span class="slightly-smaller" id="last-update">0</span> s</span> 
+        </div>
     </div>
     <div class="col-lg bordered small-padding">
         <span class="header orange">Global Position</span>
         <div id="map"></div>
+
         <button class="map-button" id="reset-zoom">Reset Zoom</button >
-        <button class="map-button" id="go-to-balloon">Go To Balloon</button >
+        <button class="map-button" id="go-to-balloon">Go To Balloon</button>
+        
+        <div style="padding-top: 1em;"></div>
+        <span class=under-value id="altitude-value">0</span><span class="under-value slightly-smaller"> m</span>
+        <br />
+        <span class=under-value id="latitude-value">0</span><span class="under-value slightly-smaller">&deg; N</span>
+        <span class=under-value id="longitude-value">0</span><span class="under-value slightly-smaller">&deg; W</span>
     </div>
 </div>
 
@@ -39,6 +61,13 @@
         <button class="authorize-button btn-primary btn-lg btn-block">Authorize</button>
     </div>
     <div class="col-lg bordered small-padding">
-        <span class="header yellow">Stuff Idk</span>
+        <span class="header yellow">Other</span>
+        <div class="vector-group">
+            <h5>Calibration Status</h5>
+            <h6>System=<span id="calib-sys">n/a</span></h6>
+            <h6>Mag=<span id="calib-mag">n/a</span></h6>
+            <h6>Accel=<span id="calib-gyro">n/a</span></h6>
+            <h6>Gyro=<span id="calib-accel">n/a</span></h6>
+        </div>
     </div>
 </div>

@@ -6,5 +6,7 @@ Rails.application.routes.draw do
   get '/out', to: "index#outData"
   get '/all', to: "index#allData"
   
+  mount Lockup::Engine, at: '/lockup'
+
   root 'index#index'
 end
