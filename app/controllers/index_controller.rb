@@ -7,16 +7,16 @@ class IndexController < ApplicationController
     def index
     end
 
-=begin
-=end    
-
     # gives latest data; will be requested by ajax
     def outData 
-        if $data
-            return render json: $data
-        else 
-            puts "No content on request"
-            return
+        Rails.logger.silence do
+            # doesn't get logged because this request comes in multiple times per second
+            if $data
+                return render json: $data
+            else 
+                puts "No content on request"
+                return
+            end
         end
     end
 

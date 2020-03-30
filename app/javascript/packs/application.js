@@ -24,6 +24,7 @@ let altitudePoints = [];
 let latlngPairs = [];
 let chart;
 let timer;
+let clockTimer;
 
 let timestampLastUpdate = 0;
 
@@ -171,8 +172,26 @@ document.addEventListener("turbolinks:load", function() {
         
             // Last time update (and remove mapbox credit)
             window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
+            
+            // time display
+            startTime()
         },
     }) 
+
+    $("#create-flight").click(() => {
+        let newFlight = prompt("Enter the name for a new flight")
+        let confirmed = confirm("Are you sure you'd like to create a new flight");
+
+        if (confirmed)
+        {
+            $.post(
+                "/newFlight",
+                {
+                    "name": newFlight,
+                }
+            )
+        }
+    })
 })
 
 /*******************
@@ -326,4 +345,21 @@ function setElements()
     })
 
     timer = $("#last-update")[0]
+}
+
+function checkTime(i) 
+{ return(i < 10) ? "0" + i : i; }
+
+export function startTime() 
+{
+    var today = new Date(),
+        h = checkTime(today.getHours()),
+        m = checkTime(today.getMinutes()),
+        s = checkTime(today.getSeconds());
+
+    document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
+    
+    clockTimer = setTimeout(function () {
+        startTime()
+    }, 500);
 }

@@ -25,6 +25,8 @@ class CreateTelemetries < ActiveRecord::Migration[6.0]
       t.integer :RSSI
       t.string  :lastNodeName
 
+      t.references :flight, null: false, foreign_key: true
+
       t.timestamps
     end
   end
