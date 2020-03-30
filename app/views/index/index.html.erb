@@ -1,3 +1,11 @@
+<div class="title-box">
+    <h2>Telemetry</h2>
+    <h5>Current Flight: "Flight 1"</h5>
+    <h5>Date: <%= Date.today %></h5>
+    <h5>Time: <span id="time"></span></h5>
+    <hr />
+</div>
+
 <div class="row">
     <div class="col-lg bordered no-bottom">
         <span class="header green">General Telemetry</span>
@@ -21,7 +29,7 @@
         </div>
     </div>
     <div class="col-lg bordered small-padding">
-        <span class="header purple">Video Stream</span>
+        <span class="header purple">Imaging</span>
         <img id="video-stream" src="http://hd.wallpaperswide.com/thumbs/earth_sunrise_from_space-t2.jpg" />
         
         <div class="last-update">
@@ -75,4 +83,10 @@
             <h6>Last RSSI: <span id="last-rssi">~</span></h6>
         </div>
     </div>
+</div>
+
+<div class="title-box configuration">
+    <h2>Configuration</h2>
+    <hr />
+    <button id=create-flight class="btn btn-primary"> Create a new flight </button>
 </div>
