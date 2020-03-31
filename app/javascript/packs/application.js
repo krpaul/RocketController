@@ -27,7 +27,8 @@ let timer;
 let clockTimer;
 let reCheckForData;
 let mode;
-let noDataAlertTimer;
+let noDataAlertTimer; 
+let noDataHidden = false;
 
 let timestampLastUpdate = 0;
 
@@ -166,7 +167,22 @@ function startup(data)
 
 function noDataAlert()
 {
-    return;
+    noDataAlertTimer = window.setInterval(() => {
+        if (noDataHidden) {
+            $(".no-data").show()
+            noDataHidden = !noDataHidden
+        }
+        else {
+            $(".no-data").hide()
+            noDataHidden = !noDataHidden
+        }
+    }, 1000)
+}
+
+function clearNoData()
+{
+    $(".no-data").hide()
+    clearInterval(noDataAlertTimer)
 }
 
 document.addEventListener("turbolinks:load", function() { 
@@ -184,6 +200,7 @@ document.addEventListener("turbolinks:load", function() {
                                 if (data.length != 0) {
                                     startup(data); 
                                     clearInterval(reCheckForData);
+                                    clearNoData();
                                 }
                             }
                         })
