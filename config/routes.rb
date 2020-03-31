@@ -1,8 +1,13 @@
 Rails.application.routes.draw do
-  get 'index/index'
+  get '/telemetry', to: "index#index"
+  get '/telemetry/other', to: "index#otherTelem"
+  get '/configuration', to: "index#configuration"
+  
   get '/reset', to: "index#reset"
   
   post '/in', to: "posting#inData"
+  post '/newFlight', to: "index#newFlight"
+
   get '/out', to: "index#outData"
   get '/all', to: "index#allData"
 
