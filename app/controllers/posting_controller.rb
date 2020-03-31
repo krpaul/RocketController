@@ -30,6 +30,16 @@ class PostingController < ApplicationController
         t.RSSI = params[:RSSI]
         t.lastNodeName = (params.has_key? :lastNodeName) ? params[:lastNodeName] : "Unknown"
         
+        # set the flight to the last flight
+        # if there isn't a last flight, create a default
+        if Telemetry.all.length == 0
+            f = Flight.new
+            f.name = "Default Flight"
+            f.desc = ""
+            f.save
+        end
+        t.flight = Flight.all.last
+        
         t.save!
         
         # set the global data var json

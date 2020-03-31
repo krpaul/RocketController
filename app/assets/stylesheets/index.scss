@@ -1,3 +1,57 @@
 // Place all the styles related to the index controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.switch
+{
+    display: inline;
+    margin-right: 1.5em;
+    font-size: 0.9em;
+    &:hover
+    { 
+        text-decoration: underline !important; 
+        cursor: pointer;
+    }
+
+    &.active
+    {
+        color: red;
+        text-decoration: none;
+        &:hover
+        { 
+            text-decoration: none !important;
+            cursor: auto !important;
+        }
+    }
+}
+
+.page-body
+{
+    margin-left: 1.75em;
+}
+
+.title-box
+{
+    margin-left: 1.75em;
+    margin-top: 0.75em;
+
+    hr {
+        color: white;
+        display: block;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: auto;
+        margin-right: auto;
+        border-style: inset;
+        border-width: 1px;
+    }
+
+    h5 {
+        display: inline;
+        margin-right: 1em;
+    }
+
+    .navinfo {
+        display: block;
+    }
+}

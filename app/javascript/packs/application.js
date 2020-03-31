@@ -25,6 +25,9 @@ let latlngPairs = [];
 let chart;
 let timer;
 let clockTimer;
+let reCheckForData;
+let mode;
+let noDataAlertTimer;
 
 let timestampLastUpdate = 0;
 
@@ -135,35 +138,63 @@ function checkDataUpdate() {
     })    
 }
 
+function startup(data)
+/* Function for all the initialization stuff that requires good data */
+{
+    // Set all data
+    allData(data)
+
+    // Create map
+    // Note mapbox coord are given at LNG / LAT, not lat/lng
+    map = new mapboxgl.Map({
+        container: 'map', // HTML container ID
+        style: 'mapbox://styles/mapbox/streets-v9', // style URL
+        center: [latlngPairs.last()[1], latlngPairs.last()[0]], 
+        zoom: 5
+    })
+
+    map.on('load', 
+        () => {
+            // Create altitude chart
+            createAltChart()
+
+            // Let the window check for an update every half second with new data
+            window.setInterval(checkDataUpdate, 500);
+        }
+    )
+}
+
+function noDataAlert()
+{
+    return;
+}
 
 document.addEventListener("turbolinks:load", function() { 
     // Get all data
     $.ajax({
         url: "/all",
         success: (data) => {
+            if (data.length != 0) {startup(data);}
+            else { // if no data availible, check for data every 5s
+                reCheckForData = window.setInterval(
+                    () => {
+                        $.ajax({
+                            url: "/all",
+                            success: (data) => {
+                                if (data.length != 0) {
+                                    startup(data); 
+                                    clearInterval(reCheckForData);
+                                }
+                            }
+                        })
+                    }, 
+                5000);
 
-            // Get all data
-            allData(data)
-
-            // Create map
-            // Note mapbox coord are given at LNG / LAT, not lat/lng
-            map = new mapboxgl.Map({
-                container: 'map', // HTML container ID
-                style: 'mapbox://styles/mapbox/streets-v9', // style URL
-                center: [latlngPairs.last()[1], latlngPairs.last()[0]], 
-                zoom: 5
-            })
+                // Set no data alerts
+                noDataAlert()
+            }
         
-            map.on('load', 
-                function() {
-                    // Create altitude chart
-                    createAltChart()
-        
-                    // Let the window check for an update every hald second with new data
-                    window.setInterval(checkDataUpdate, 500);
-                }
-            )
-        
+            /* Stuff that doesn't require data */
             // Set button events
             setElements()
             
@@ -178,16 +209,23 @@ document.addEventListener("turbolinks:load", function() {
         },
     }) 
 
+
     $("#create-flight").click(() => {
-        let newFlight = prompt("Enter the name for a new flight")
-        let confirmed = confirm("Are you sure you'd like to create a new flight");
+        var flight = ""
+
+        while (flight == "")
+            flight = prompt("Enter the name for a new flight")
+
+        var desc = prompt("Enter a description for this flight")
+        var confirmed = confirm("Create a new flight?");
 
         if (confirmed)
         {
             $.post(
                 "/newFlight",
                 {
-                    "name": newFlight,
+                    "name": flight,
+                    "desc": desc
                 }
             )
         }

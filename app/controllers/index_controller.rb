@@ -7,6 +7,12 @@ class IndexController < ApplicationController
     def index
     end
 
+    def otherTelem
+    end
+
+    def configuration
+    end
+
     # gives latest data; will be requested by ajax
     def outData 
         Rails.logger.silence do
@@ -22,7 +28,16 @@ class IndexController < ApplicationController
 
     # returns the whole database
     def allData
-        return render json: Telemetry.all.map {|s| reconstructJSON s }
+        return render json: Flight.all.last.telemetries.map {|s| reconstructJSON s }
+    end
+
+    # creates a new flight
+    def newFlight
+        f = Flight.new
+        f.name = params[:name]
+        f.desc = params[:desc]
+        f.save
+        return redirect_to '/'
     end
 
     # clears the database
