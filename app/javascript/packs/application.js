@@ -161,28 +161,16 @@ function startup(data)
 
             // Let the window check for an update every half second with new data
             window.setInterval(checkDataUpdate, 500);
+
+            map.loadImage(
+                'https://cdn1.iconfinder.com/data/icons/transports-5/66/56-512.png',
+                function(error, image) {
+                    if (error) throw error;
+                    map.addImage('bln', image);
+                }   
+            );
         }
     )
-}
-
-function noDataAlert()
-{
-    noDataAlertTimer = window.setInterval(() => {
-        if (noDataHidden) {
-            $(".no-data").show()
-            noDataHidden = !noDataHidden
-        }
-        else {
-            $(".no-data").hide()
-            noDataHidden = !noDataHidden
-        }
-    }, 1000)
-}
-
-function clearNoData()
-{
-    $(".no-data").hide()
-    clearInterval(noDataAlertTimer)
 }
 
 document.addEventListener("turbolinks:load", function() { 
@@ -205,53 +193,53 @@ document.addEventListener("turbolinks:load", function() {
                             }
                         })
                     }, 
-                5000);
-
-                // Set no data alerts
-                noDataAlert()
-            }
-        
-            /* Stuff that doesn't require data */
-            // Set button events
-            setElements()
-            
-            // Timer
-            resetTimeSinceLastUpdate()
-        
-            // Last time update (and remove mapbox credit)
-            window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
-            
-            // time display
-            startTime()
-        },
-    }) 
-
-
-    $("#create-flight").click(() => {
-        var flight = ""
-
-        while (flight == "")
-            flight = prompt("Enter the name for a new flight")
-
-        var desc = prompt("Enter a description for this flight")
-        var confirmed = confirm("Create a new flight?");
-
-        if (confirmed)
-        {
-            $.post(
-                "/newFlight",
-                {
-                    "name": flight,
-                    "desc": desc
+                    5000);
+                    
+                    // Set no data alerts
+                    noDataAlert()
                 }
-            )
-        }
-    })
-})
+                
+                /* Stuff that doesn't require data */
+                // Set button events
+                setElements()
+                
+                // Timer
+                resetTimeSinceLastUpdate()
+                
+                // Last time update (and remove mapbox credit)
+                window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
+                
+                // time display
+                startTime()
+            },
+        }) 
+        
+        
+        $("#create-flight").click(() => {
+            var flight = ""
+            
+            while (flight == "")
+            flight = prompt("Enter the name for a new flight")
+            
+            var desc = prompt("Enter a description for this flight")
+            var confirmed = confirm("Create a new flight?");
 
+            if (confirmed)
+            {
+                $.post(
+                    "/newFlight",
+                    {
+                        "name": flight,
+                        "desc": desc
+                    }
+                    )
+                }
+            })
+        })
+        
 /*******************
-    Utility Methods 
-*******************/
+ Utility Methods 
+    *******************/
 
 // `lines` is an array of [lat, lng] pairs
 function addMapLines(lines)
@@ -259,13 +247,50 @@ function addMapLines(lines)
     // Quick and dirty approach to this function:
     // deleting and recreating the layer each time, 
     // but works for now
-
+    
     if (map.getLayer('route')) 
     {
         map.removeLayer('route')
         map.removeSource('route')
     }
+    
+    if (map.getLayer('balloon-point'))
+    {
+        map.removeLayer('balloon-point')
+        map.removeSource('balloon')
+    }
 
+    var newLines = lines.map(x => [x[1], x[0]])  // flip lat/lng
+    console.log(newLines)
+    
+    // point
+    map.addSource('balloon', {
+        'type': 'geojson',
+        'data': {
+            'type': 'FeatureCollection',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': newLines.last()
+                    }
+                }
+            ]
+        }
+    });
+
+    map.addLayer({
+        'id': 'balloon-point',
+        'type': 'symbol',
+        'source': 'balloon',
+        'layout': {
+            'icon-image': 'bln',
+            'icon-size': 0.05,
+        }
+    });
+
+    // lines
     map.addLayer(
         {
             "id": "route",
@@ -277,7 +302,7 @@ function addMapLines(lines)
                     "properties": {},
                     "geometry": {
                         "type": "LineString",
-                        "coordinates": lines
+                        "coordinates": newLines
                     }
                 }
             },
@@ -292,7 +317,7 @@ function addMapLines(lines)
         }
     )  
 }
-
+            
 function createAltChart() 
 {
     chart = new CanvasJS.Chart("altGraph", { 
@@ -318,38 +343,38 @@ function createAltChart()
 
 function formatUnixTime(args, mode=0) 
 /*
-    mode=0 -> HH:MM
-    mode=1 -> MM:SS
+mode=0 -> HH:MM
+mode=1 -> MM:SS
 */
 {
     if (!args) return
-
+    
     // If given as part of an object, or as just the value
     var value = args.value || args
     
     var date = new Date(value * 1000)
-
+    
     switch (mode)
     {
         default: 
         case 0: 
-            return `${date.getHours()}h ${date.getMinutes()}m`
+        return `${date.getHours()}h ${date.getMinutes()}m`
         case 1:
             return `${date.getMinutes()}m ${date.getSeconds()}s`
-    }
+        }
 }
 
 function toolTipFormatter(e)
 {
     var content = "";
     for (var i = 0; i < e.entries.length; i++) {
-
+        
         // Create html for this tooltip entry
         var current = 
-            `<strong>
-            ${formatUnixTime(e.entries[i].dataPoint.x, mode=1)}
-            </strong>, 
-            ${e.entries[i].dataPoint.y}m`
+        `<strong>
+        ${formatUnixTime(e.entries[i].dataPoint.x, mode=1)}
+        </strong>, 
+        ${e.entries[i].dataPoint.y}m`
         
         // Append to overarching string
         content += current + "<br />"
@@ -366,8 +391,8 @@ function resetTimeSinceLastUpdate()
 { timer.innerText = "0" }
 
 /*******************
-    Button Methods 
-*******************/
+ Button Methods 
+ *******************/
 
 function _resetZoom()
 {
@@ -387,7 +412,7 @@ function _goTo()
 function removeCredit()
 {
     if ($(".canvasjs-chart-credit")[0])
-        $(".canvasjs-chart-credit")[0].remove()
+    $(".canvasjs-chart-credit")[0].remove()
 }
 
 function setElements()
@@ -398,7 +423,7 @@ function setElements()
         _goTo()
         _resetZoom()
     })
-
+    
     timer = $("#last-update")[0]
 }
 
@@ -408,13 +433,33 @@ function checkTime(i)
 export function startTime() 
 {
     var today = new Date(),
-        h = checkTime(today.getHours()),
-        m = checkTime(today.getMinutes()),
-        s = checkTime(today.getSeconds());
-
+    h = checkTime(today.getHours()),
+    m = checkTime(today.getMinutes()),
+    s = checkTime(today.getSeconds());
+    
     document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
     
     clockTimer = setTimeout(function () {
         startTime()
     }, 500);
+}
+
+function noDataAlert()
+{
+    noDataAlertTimer = window.setInterval(() => {
+        if (noDataHidden) {
+            $(".no-data").show()
+            noDataHidden = !noDataHidden
+        }
+        else {
+            $(".no-data").hide()
+            noDataHidden = !noDataHidden
+        }
+    }, 1000)
+}
+
+function clearNoData()
+{
+    $(".no-data").hide()
+    clearInterval(noDataAlertTimer)
 }
