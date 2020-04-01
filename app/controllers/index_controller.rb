@@ -8,6 +8,8 @@ class IndexController < ApplicationController
     end
 
     def otherTelem
+        @relevantTelem = Flight.all.last.telemetries
+        
     end
 
     def configuration
