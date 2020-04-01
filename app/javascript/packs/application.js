@@ -1,9 +1,11 @@
+import { pluginService } from "chart.js"
+
 require("@rails/ujs").start()
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
 
-require("chartkick")
+require("chartkick").use(require("highcharts"))
 require("chart.js")
 
 // Uncomment to copy all static images under ../images to the output folder and reference
@@ -32,8 +34,8 @@ let reCheckForData;
 let mode;
 let noDataAlertTimer; 
 let noDataHidden = false;
-
 let timestampLastUpdate = 0;
+let pageType;
 
 function newData(data)
 {
@@ -84,6 +86,53 @@ function newData(data)
 
     // reset timer
     resetTimeSinceLastUpdate()
+}
+
+function pluck(data, field)
+{
+    var ret = []
+    data.forEach(data => {
+        ret.push([data.timestamp, data[field]])
+    })
+}
+
+function newOtherData(data)
+{
+    if (!data // if data does not exist
+        || data == undefined // or is not of the form we want
+        || data.timestamp <= timestampLastUpdate // or is not new
+    )
+    {
+        return // Don't do anything
+    }
+
+    /* Otherwise ... */
+
+    // Update latest time
+    timestampLastUpdate = data.timestamp
+
+    var acceleration = [
+        {"name": "X", "data": pluck(data, "accelerationX"), "color": "#f00"},
+        {"name": "Y", "data": pluck(data, "accelerationY"), "color": "#06f"},
+        {"name": "Z", "data": pluck(data, "accelerationZ"), "color": "#0f0"}
+    ]
+
+    var gyro = [
+        {"name": "X", "data": pluck(data, "gyroX"), "color": "#f00"},
+        {"name": "Y", "data": pluck(data, "gyroX"), "color": "#06f"},
+        {"name": "Z", "data": pluck(data, "gyroX"), "color": "#0f0"}
+    ]
+
+    var orientation = [
+        {"name": "X", "data": pluck(data, "orientationX"), "color": "#f00"},
+        {"name": "Y", "data": pluck(data, "orientationX"), "color": "#06f"},
+        {"name": "Z", "data": pluck(data, "orientationX"), "color": "#0f0"}
+    ]
+
+    var rssi = pluck(data, "RSSI")
+
+    // Chartkick.chart["accel"].updateData(acceleration);
+    // Chartkick.chart["accel"].redraw();
 }
 
 function updateGeneralTelemetry(packet)
@@ -142,6 +191,13 @@ function checkDataUpdate() {
     })    
 }
 
+function checkOtherDataUpdate() {
+    $.ajax({
+        url: "/out",
+        success: newOtherData,
+    })    
+}
+
 function startup(data)
 /* Function for all the initialization stuff that requires good data */
 {
@@ -176,48 +232,61 @@ function startup(data)
     )
 }
 
+function setup()
+/* Stuff that doesn't require data */
+{
+    // Set button events
+    setElements()
+
+    // Timer
+    resetTimeSinceLastUpdate()
+
+    // Last time update (and remove mapbox credit)
+    window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
+
+    // time display
+    startTime()
+}
+
 document.addEventListener("turbolinks:load", function() { 
-    // Get all data
-    $.ajax({
-        url: "/all",
-        success: (data) => {
-            if (data.length != 0) {startup(data);}
-            else { // if no data availible, check for data every 5s
-                reCheckForData = window.setInterval(
-                    () => {
-                        $.ajax({
-                            url: "/all",
-                            success: (data) => {
-                                if (data.length != 0) {
-                                    startup(data); 
-                                    clearInterval(reCheckForData);
-                                    clearNoData();
+    let pageType= $(".active")[0].id;
+    switch (pageType) {
+
+    case "telemetry":
+        // Get all data
+        $.ajax({
+            url: "/all",
+            success: (data) => {
+                if (data.length != 0) {startup(data);}
+                else { // if no data availible, check for data every 5s
+                    reCheckForData = window.setInterval(
+                        () => {
+                            $.ajax({
+                                url: "/all",
+                                success: (data) => {
+                                    if (data.length != 0) {
+                                        startup(data); 
+                                        clearInterval(reCheckForData);
+                                        clearNoData();
+                                    }
                                 }
-                            }
-                        })
-                    }, 
-                    5000);
-                    
-                    // Set no data alerts
-                    noDataAlert()
-                }
-                
-                /* Stuff that doesn't require data */
-                // Set button events
-                setElements()
-                
-                // Timer
-                resetTimeSinceLastUpdate()
-                
-                // Last time update (and remove mapbox credit)
-                window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
-                
-                // time display
-                startTime()
+                            })
+                        }, 
+                        5000);
+                        
+                        // Set no data alerts
+                        noDataAlert()
+                 }
+
+                // other setup
+                setup()
+                window.setInterval(function() {updateTimeSinceLastUpdate()}, 1000)
             },
         }) 
-        
-        
+    case "other":
+        setup()
+        window.setInterval(checkOtherDataUpdate, 500);
+    case "config":
         $("#create-flight").click(() => {
             var flight = ""
             
@@ -235,10 +304,11 @@ document.addEventListener("turbolinks:load", function() {
                         "name": flight,
                         "desc": desc
                     }
-                    )
-                }
-            })
+                )
+            }
         })
+    }   
+})
         
 /*******************
     Utility Methods 
