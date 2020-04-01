@@ -1,4 +1,10 @@
 <%= render partial: "navbar", locals: {active: "other"} %>
-<div class=page-body>
-    graphs n wahtnot
+<div class=page-body id=other>
+    <%= line_chart 
+        @relevantTelem.pluck(:created_at, :alt),  
+        xtitle: "Time", ytitle: "Altitude", 
+        min: @relevantTelem.first.created_at, max: @relevantTelem.last.created_at,
+        width: "30%", height: "30em",
+        colors: ["#b00", "#666"]
+    %>
 </div>

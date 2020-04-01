@@ -3,6 +3,9 @@ require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
 
+require("chartkick")
+require("chart.js")
+
 // Uncomment to copy all static images under ../images to the output folder and reference
 // them with the image_pack_tag helper in views (e.g <%= image_pack_tag 'rails.png' %>)
 // or the `imagePath` JavaScript helper below.
@@ -238,8 +241,8 @@ document.addEventListener("turbolinks:load", function() {
         })
         
 /*******************
- Utility Methods 
-    *******************/
+    Utility Methods 
+*******************/
 
 // `lines` is an array of [lat, lng] pairs
 function addMapLines(lines)
@@ -391,8 +394,8 @@ function resetTimeSinceLastUpdate()
 { timer.innerText = "0" }
 
 /*******************
- Button Methods 
- *******************/
+    Button Methods 
+*******************/
 
 function _resetZoom()
 {
@@ -403,8 +406,9 @@ function _resetZoom()
 
 function _goTo()
 {
+    var pair = latlngPairs.last() || [0, 0];
     map.jumpTo({
-        center: latlngPairs.last() || [0, 0]
+        center:  [pair[1], pair[0]]
     })
 }
 
