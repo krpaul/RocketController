@@ -9,7 +9,6 @@ class IndexController < ApplicationController
 
     def otherTelem
         @relevantTelem = Flight.all.last.telemetries
-        
     end
 
     def configuration
@@ -17,14 +16,12 @@ class IndexController < ApplicationController
 
     # gives latest data; will be requested by ajax
     def outData 
-        Rails.logger.silence do
-            # doesn't get logged because this request comes in multiple times per second
-            if $data
-                return render json: $data
-            else 
-                puts "No content on request"
-                return
-            end
+        # doesn't get logged because this request comes in multiple times per second
+        if $data
+            return render json: $data
+        else 
+            puts "No content on request"
+            return
         end
     end
 
