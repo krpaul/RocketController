@@ -1,5 +1,3 @@
-import { pluginService } from "chart.js"
-
 require("@rails/ujs").start()
 require("turbolinks").start()
 require("@rails/activestorage").start()
@@ -90,50 +88,45 @@ function newData(data)
 
 function newOtherData(data)
 {
-    if (!data // if data does not exist
+    // is not new
+    if (data.timestamp <= timestampLastUpdate)
+    { return } // Don't do anything 
+    else if (!data // if data does not exist
         || data == undefined // or is not of the form we want
-        || data.timestamp <= timestampLastUpdate // or is not new
-        )
-    {
-        return // Don't do anything
+        || timestampLastUpdate == 0
+    ) {
+        timestampLastUpdate = data.timestamp;
+        return;
     }
-    
-    console.log(data.acceleration)
+
     /* Otherwise ... */
 
     // Update latest time
     timestampLastUpdate = data.timestamp;
-    var stamp = data["tstamp-formatted"];
+    var stamp = data.timestamp;
 
+    var a = Chartkick.charts["accel"]
+    a.dataSource[0].data.push([stamp, data.acceleration.x])
+    a.dataSource[1].data.push([stamp, data.acceleration.y])
+    a.dataSource[2].data.push([stamp, data.acceleration.z])
 
-    // var acceleration = [
-    //     {"name": "X", "data": [stamp, data.accelerationX], "color": "#f00"},
-    //     {"name": "Y", "data": [stamp, data.accelerationY], "color": "#06f"},
-    //     {"name": "Z", "data": [stamp, data.accelerationZ], "color": "#0f0"}
-    // ]
+    var g = Chartkick.charts["gyro"]
+    g.dataSource[0].data.push([stamp, data.gyro.x])
+    g.dataSource[1].data.push([stamp, data.gyro.y])
+    g.dataSource[2].data.push([stamp, data.gyro.z])
 
-    // var gyro = [
-    //     {"name": "X", "data": [stamp, data.gyroX], "color": "#f00"},
-    //     {"name": "Y", "data": [stamp, data.gyroX], "color": "#06f"},
-    //     {"name": "Z", "data": [stamp, data.gyroX], "color": "#0f0"}
-    // ]
+    var o = Chartkick.charts["orientation"]
+    o.dataSource[0].data.push([stamp, data.orientation.x])
+    o.dataSource[1].data.push([stamp, data.orientation.y])
+    o.dataSource[2].data.push([stamp, data.orientation.z])
 
-    // var orientation = [
-    //     {"name": "X", "data": [stamp, data.orientationX], "color": "#f00"},
-    //     {"name": "Y", "data": [stamp, data.orientationX], "color": "#06f"},
-    //     {"name": "Z", "data": [stamp, data.orientationX], "color": "#0f0"}
-    // ]
+    var r = Chartkick.charts["rssi"]
+    r.dataSource.push([stamp, data.RSSI])
 
-    // console.log(acceleration)
-
-    var rssi = (stamp, data.RSSI)
-
-    Chartkick.charts["accel"].updateData({
-        "X": [stamp, data.acceleration.x],
-        "Y": [stamp, data.acceleration.y],
-        "Z": [stamp, data.acceleration.z]
-    });
-    // Chartkick.charts["accel"].redraw();
+    Chartkick.eachChart(function(chart) {
+        chart.refreshData()
+        chart.redraw()
+    })
 }
 
 function updateGeneralTelemetry(packet)
