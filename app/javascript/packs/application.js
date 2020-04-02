@@ -88,51 +88,52 @@ function newData(data)
     resetTimeSinceLastUpdate()
 }
 
-function pluck(data, field)
-{
-    var ret = []
-    data.forEach(data => {
-        ret.push([data.timestamp, data[field]])
-    })
-}
-
 function newOtherData(data)
 {
     if (!data // if data does not exist
         || data == undefined // or is not of the form we want
         || data.timestamp <= timestampLastUpdate // or is not new
-    )
+        )
     {
         return // Don't do anything
     }
-
+    
+    console.log(data.acceleration)
     /* Otherwise ... */
 
     // Update latest time
-    timestampLastUpdate = data.timestamp
+    timestampLastUpdate = data.timestamp;
+    var stamp = data["tstamp-formatted"];
 
-    var acceleration = [
-        {"name": "X", "data": pluck(data, "accelerationX"), "color": "#f00"},
-        {"name": "Y", "data": pluck(data, "accelerationY"), "color": "#06f"},
-        {"name": "Z", "data": pluck(data, "accelerationZ"), "color": "#0f0"}
-    ]
 
-    var gyro = [
-        {"name": "X", "data": pluck(data, "gyroX"), "color": "#f00"},
-        {"name": "Y", "data": pluck(data, "gyroX"), "color": "#06f"},
-        {"name": "Z", "data": pluck(data, "gyroX"), "color": "#0f0"}
-    ]
+    // var acceleration = [
+    //     {"name": "X", "data": [stamp, data.accelerationX], "color": "#f00"},
+    //     {"name": "Y", "data": [stamp, data.accelerationY], "color": "#06f"},
+    //     {"name": "Z", "data": [stamp, data.accelerationZ], "color": "#0f0"}
+    // ]
 
-    var orientation = [
-        {"name": "X", "data": pluck(data, "orientationX"), "color": "#f00"},
-        {"name": "Y", "data": pluck(data, "orientationX"), "color": "#06f"},
-        {"name": "Z", "data": pluck(data, "orientationX"), "color": "#0f0"}
-    ]
+    // var gyro = [
+    //     {"name": "X", "data": [stamp, data.gyroX], "color": "#f00"},
+    //     {"name": "Y", "data": [stamp, data.gyroX], "color": "#06f"},
+    //     {"name": "Z", "data": [stamp, data.gyroX], "color": "#0f0"}
+    // ]
 
-    var rssi = pluck(data, "RSSI")
+    // var orientation = [
+    //     {"name": "X", "data": [stamp, data.orientationX], "color": "#f00"},
+    //     {"name": "Y", "data": [stamp, data.orientationX], "color": "#06f"},
+    //     {"name": "Z", "data": [stamp, data.orientationX], "color": "#0f0"}
+    // ]
 
-    // Chartkick.chart["accel"].updateData(acceleration);
-    // Chartkick.chart["accel"].redraw();
+    // console.log(acceleration)
+
+    var rssi = (stamp, data.RSSI)
+
+    Chartkick.charts["accel"].updateData({
+        "X": [stamp, data.acceleration.x],
+        "Y": [stamp, data.acceleration.y],
+        "Z": [stamp, data.acceleration.z]
+    });
+    // Chartkick.charts["accel"].redraw();
 }
 
 function updateGeneralTelemetry(packet)
