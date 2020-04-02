@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   
   post '/in', to: "posting#inData"
   post '/newFlight', to: "index#newFlight"
+  post '/isFlight', to: "index#isFlight"
+  post '/setActiveFlight', to: "index#setFlight"
 
   get '/out', to: "index#outData"
   get '/all', to: "index#allData"

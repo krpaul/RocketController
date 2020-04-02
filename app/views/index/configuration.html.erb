@@ -1,5 +1,13 @@
 <%= render partial: "navbar", locals: {active: "config"} %>
 <div class=page-body>
     <hr />
+    <select class="form-control flight-select">
+        <% for fl in Flight.all %>
+            <option><%= fl.name %></option>
+        <% end %>
+    </select>
+    <br />
+    <button id=select-flight class="btn btn-primary">Select This Flight</button>
+    <br />
     <button id=create-flight class="btn btn-lg btn-primary"> Create a new flight </button>
 </div>
