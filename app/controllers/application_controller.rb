@@ -27,7 +27,10 @@ class ApplicationController < ActionController::Base
             },
             "RSSI": db_col.RSSI,
             "lastNodeName": db_col.lastNodeName,
-            "timestamp" => db_col.created_at.to_time.to_i # add timestamp
+            
+            # add timestamps
+            "timestamp" => db_col.created_at.to_time.to_i,
+            "tstamp-formatted" => db_col.created_at.to_s
         }
     end
 end
