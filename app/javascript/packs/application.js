@@ -89,15 +89,13 @@ function newData(data)
 function newOtherData(data)
 {
     // is not new
-    if (data.timestamp <= timestampLastUpdate)
-    { return } // Don't do anything 
-    else if (!data // if data does not exist
-        || data == undefined // or is not of the form we want
-        || timestampLastUpdate == 0
-    ) {
+    if (!data || data == undefined) return
+    else if (timestampLastUpdate == 0) {
         timestampLastUpdate = data.timestamp;
         return;
-    }
+    } 
+    else if (data.timestamp <= timestampLastUpdate)
+    { return } // Don't do anything 
 
     /* Otherwise ... */
 
@@ -283,23 +281,35 @@ document.addEventListener("turbolinks:load", function() {
     case "config":
         $("#create-flight").click(() => {
             var flight = ""
+            while (flight == "") 
+                flight = prompt("Enter the name for a new flight")
             
-            while (flight == "")
-            flight = prompt("Enter the name for a new flight")
-            
-            var desc = prompt("Enter a description for this flight")
-            var confirmed = confirm("Create a new flight?");
-
-            if (confirmed)
-            {
-                $.post(
-                    "/newFlight",
+            $.post(
+                "/isFlight",
+                { "name": flight },               
+                (data) => {
+                    if (data.exists)
+                    { 
+                        alert("A flight with that name already exists!"); 
+                    }   
+                    else
                     {
-                        "name": flight,
-                        "desc": desc
+                        var desc = prompt("Enter a description for this flight")
+                        var confirmed = confirm("Create a new flight?");
+            
+                        if (confirmed)
+                        {
+                            $.post(
+                                "/newFlight",
+                                {
+                                    "name": flight,
+                                    "desc": desc
+                                }
+                            )
+                        }
                     }
-                )
-            }
+                },
+            )
         })
     }   
 })

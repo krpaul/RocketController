@@ -39,6 +39,13 @@ class IndexController < ApplicationController
         return redirect_to '/'
     end
 
+    def isFlight
+        return render json: {"exists": Flight.where(name: params[:name]).length != 0}
+    end
+
+    def setFlight
+    end
+
     # clears the database
     def reset
         Telemetry.delete_all
