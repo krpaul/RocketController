@@ -37,26 +37,161 @@ let noDataHidden = false;
 let timestampLastUpdate = 0;
 let pageType;
 let currentFlight;
+let updateInterval;
 
-function verifyPacket(data, oldPacket=false)
+document.addEventListener("turbolinks:load", function() { 
+    currentFlight = getCookie("flight")
+
+    if (currentFlight != undefined && currentFlight != "")
+        $("#flight-name")[0].innerText = currentFlight
+    else 
+        currentFlight = "";
+
+    let pageType = $(".active")[0].id;
+    switch (pageType) {
+
+    case "telemetry":
+        // Get all data
+        $.ajax({
+            url: "/all",
+            data: { "flight": currentFlight },
+            success: (data) => {
+                if (data.length != 0) { startup(data); }
+                else if (currentFlight == "") { // if no data availible, check for data every 5s (as long we're querying for the current flight)
+                    reCheckForData = window.setInterval(
+                        () => {
+                            $.ajax({
+                                url: "/all",
+                                data: { "flight": currentFlight },
+                                success: (data) => {
+                                    if (data.length != 0) {
+                                        startup(data); 
+                                        clearInterval(reCheckForData);
+                                        clearNoData();
+                                    }
+                                }
+                            })
+                        }, 
+                        5000);
+                        
+                        // Set no data alerts
+                        noDataAlert()
+                 }
+
+                // other setup
+                setup()
+            },
+        }) 
+        break;
+
+    case "other":
+        setup()
+        if (currentFlight)
+        {
+            $.post(
+                "/allFlightData",
+                { "flight": currentFlight },
+                (data) => {
+                    var a = Chartkick.charts["accel"]
+                    a.dataSource[0].data = data.acceleration[0];
+                    a.dataSource[1].data = data.acceleration[1];
+                    a.dataSource[2].data = data.acceleration[2];
+        
+                    var g = Chartkick.charts["gyro"]
+                    g.dataSource[0].data = data.gyro[0];
+                    g.dataSource[1].data = data.gyro[1];
+                    g.dataSource[2].data = data.gyro[2];
+        
+                    var o = Chartkick.charts["orientation"]
+                    o.dataSource[0].data = data.orientation[0];
+                    o.dataSource[1].data = data.orientation[1];
+                    o.dataSource[2].data = data.orientation[2];
+        
+                    var r = Chartkick.charts["rssi"]
+                    r.dataSource = data.rssi;
+        
+                    Chartkick.eachChart(function(chart) {
+                        chart.refreshData()
+                        chart.redraw()
+                    })
+                }
+            )
+        }
+        else
+        {
+            window.setInterval(() => {checkDataUpdate(newOtherData)}, UPDATE_INTERVAL_MS);
+        }
+        break;
+
+    case "config":
+        $("#create-flight").click(() => {
+            var flight = ""
+            while (flight == "") 
+                flight = prompt("Enter the name for a new flight")
+            
+            $.post(
+                "/isFlight",
+                { "name": flight },               
+                (data) => {
+                    if (data.exists)
+                    { 
+                        alert("A flight with that name already exists!"); 
+                    }   
+                    else
+                    {
+                        var desc = prompt("Enter a description for this flight")
+                        var confirmed = confirm("Create a new flight?");
+            
+                        if (confirmed)
+                        {
+                            $.post(
+                                "/newFlight",
+                                {
+                                    "name": flight,
+                                    "desc": desc
+                                }
+                            )
+                        }
+                    }
+                },
+            )
+        });
+
+        $("#select-flight").click(() => {
+            currentFlight = $(".flight-select")[0].value;
+            setCookie("flight", currentFlight, 5)
+            $("#flight-name")[0].innerText = currentFlight
+        });
+
+        $("#curr-flight").click(() => {
+            currentFlight = ""
+            setCookie("flight", currentFlight, 1)
+            location.reload()
+            return false
+        });
+        break;
+    }  
+})
+
+function verifyPacket(data)
 {
     // undef
     if (!data || data == undefined) {
         return false
     }
     // not new
-    else if (!oldPacket && data.timestamp <= timestampLastUpdate) { 
+    else if (data.timestamp <= timestampLastUpdate) { 
         return false 
     } 
     // not from this flight
-    else if (!oldPacket && currentFlight != "" && data.flight != currentFlight) { 
+    else if (currentFlight != "" && data.flight != currentFlight) { 
         return false 
     }
     
     return true
 }
 
-function newData(data, oldPacket=false) // oldPacket is used to bypass certain checks and appends for when we're browsing old data
+function newData(data) // oldPacket is used to bypass certain checks and appends for when we're browsing old data
 {
     if (!verifyPacket(data)) 
     { return }
@@ -71,17 +206,11 @@ function newData(data, oldPacket=false) // oldPacket is used to bypass certain c
     var lat = parseFloat(data.lat)
     var lng = parseFloat(data.lng)
 
-    $("#altitude-value")[0].innerText  = alt.toFixed(1)
-    $("#latitude-value")[0].innerText  = lat.toFixed(2)
-    $("#longitude-value")[0].innerText = lng.toFixed(2)
+    // Add pair to lines
+    latlngPairs.push([lat, lng])
 
-    if (!oldPacket) {
-        // Add pair to lines
-        latlngPairs.push([lat, lng])
-    
-        // Add altitude
-        altitudePoints.push(alt)
-    }
+    // Add altitude
+    altitudePoints.push(alt)
 
     // Add a line to the map
     addMapLines(latlngPairs)
@@ -102,6 +231,7 @@ function newData(data, oldPacket=false) // oldPacket is used to bypass certain c
 
     // reset timer
     resetTimeSinceLastUpdate()
+    setTimeSinceLastUpdate()
 }
 
 function newOtherData(data)
@@ -145,6 +275,14 @@ function newOtherData(data)
 
 function updateGeneralTelemetry(packet)
 {
+    var alt = parseFloat(packet.alt)
+    var lat = parseFloat(packet.lat)
+    var lng = parseFloat(packet.lng)
+
+    $("#altitude-value")[0].innerText  = alt.toFixed(1)
+    $("#latitude-value")[0].innerText  = lat.toFixed(2)
+    $("#longitude-value")[0].innerText = lng.toFixed(2)
+
     // update acceleration vect
     $("#accel-x")[0].innerText = packet.acceleration.x
     $("#accel-y")[0].innerText = packet.acceleration.y
@@ -220,7 +358,7 @@ function startup(data)
         createAltChart()
         
         // load first packet
-        newData(data.last(), true)
+        updateGeneralTelemetry(data.last())
 
         // Let the window check for an update every half second with new data
         window.setInterval(() => {checkDataUpdate(newData)}, UPDATE_INTERVAL_MS);
@@ -245,144 +383,12 @@ function setup()
     // Timer
     resetTimeSinceLastUpdate()
 
-    // Last time update (and remove mapbox credit)
-    window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
+    setTimeSinceLastUpdate()
 
     // time display
     startTime()
 }
 
-document.addEventListener("turbolinks:load", function() { 
-    currentFlight = getCookie("flight")
-
-    if (currentFlight != undefined && currentFlight != "")
-        $("#flight-name")[0].innerText = currentFlight
-    else 
-        currentFlight = "";
-
-    let pageType = $(".active")[0].id;
-    switch (pageType) {
-
-    case "telemetry":
-        // Get all data
-        $.ajax({
-            url: "/all",
-            data: { "flight": currentFlight },
-            success: (data) => {
-                if (data.length != 0) { startup(data); }
-                else if (currentFlight == "") { // if no data availible, check for data every 5s (as long we're querying for the current flight)
-                    reCheckForData = window.setInterval(
-                        () => {
-                            $.ajax({
-                                url: "/all",
-                                data: { "flight": currentFlight },
-                                success: (data) => {
-                                    if (data.length != 0) {
-                                        startup(data); 
-                                        clearInterval(reCheckForData);
-                                        clearNoData();
-                                    }
-                                }
-                            })
-                        }, 
-                        5000);
-                        
-                        // Set no data alerts
-                        noDataAlert()
-                 }
-
-                // other setup
-                setup()
-            },
-        }) 
-        break;
-    case "other":
-        setup()
-        if (currentFlight)
-        {
-            $.post(
-                "/allFlightData",
-                { "flight": currentFlight },
-                (data) => {
-                    var a = Chartkick.charts["accel"]
-                    a.dataSource[0].data = data.acceleration[0];
-                    a.dataSource[1].data = data.acceleration[1];
-                    a.dataSource[2].data = data.acceleration[2];
-        
-                    var g = Chartkick.charts["gyro"]
-                    g.dataSource[0].data = data.gyro[0];
-                    g.dataSource[1].data = data.gyro[1];
-                    g.dataSource[2].data = data.gyro[2];
-        
-                    var o = Chartkick.charts["orientation"]
-                    o.dataSource[0].data = data.orientation[0];
-                    o.dataSource[1].data = data.orientation[1];
-                    o.dataSource[2].data = data.orientation[2];
-        
-                    var r = Chartkick.charts["rssi"]
-                    r.dataSource = data.rssi;
-        
-                    Chartkick.eachChart(function(chart) {
-                        chart.refreshData()
-                        chart.redraw()
-                    })
-                }
-            )
-        }
-        else
-        {
-            window.setInterval(() => {checkDataUpdate(newOtherData)}, UPDATE_INTERVAL_MS);
-        }
-        break;
-    case "config":
-        $("#create-flight").click(() => {
-            var flight = ""
-            while (flight == "") 
-                flight = prompt("Enter the name for a new flight")
-            
-            $.post(
-                "/isFlight",
-                { "name": flight },               
-                (data) => {
-                    if (data.exists)
-                    { 
-                        alert("A flight with that name already exists!"); 
-                    }   
-                    else
-                    {
-                        var desc = prompt("Enter a description for this flight")
-                        var confirmed = confirm("Create a new flight?");
-            
-                        if (confirmed)
-                        {
-                            $.post(
-                                "/newFlight",
-                                {
-                                    "name": flight,
-                                    "desc": desc
-                                }
-                            )
-                        }
-                    }
-                },
-            )
-        });
-
-        $("#select-flight").click(() => {
-            currentFlight = $(".flight-select")[0].value;
-            setCookie("flight", currentFlight, 5)
-            $("#flight-name")[0].innerText = currentFlight
-        });
-
-        $("#curr-flight").click(() => {
-            currentFlight = ""
-            setCookie("flight", currentFlight, 1)
-            location.reload()
-            return false
-        });
-        break;
-    }  
-})
         
 /*******************
     Utility Methods 
@@ -529,13 +535,22 @@ function toolTipFormatter(e)
     return content
 }
 
+function setTimeSinceLastUpdate()
+{
+    // Last time update (and remove mapbox credit)
+    updateInterval = window.setInterval(function() {updateTimeSinceLastUpdate(); removeCredit();}, 1000)
+}
+
 function updateTimeSinceLastUpdate()
 {
     timer.innerText = String(parseInt(timer.innerText) + 1)
 }
 
 function resetTimeSinceLastUpdate()
-{ timer.innerText = "0" }
+{ 
+    clearInterval(updateInterval);
+    timer.innerText = "0" 
+}
 
 
 function clearNoData()
