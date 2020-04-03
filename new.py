@@ -3,24 +3,37 @@ from time import sleep
 import requests as r
 
 def main():
-    endpoint = "http://localhost:3000/in"
-
-    lat = randint(44*100, 55*100) / 100
-    lng = randint(-110*100, -70*100) / 100
-    alt = randint(1000, 2000)
-    gps_quality = 1
-    horizontal_dil = 1.2 # horizontal dilution of precision
-
-    print(lat, lng)
+    endpoint = "http://51.161.8.25/in"
 
     while True:
         # construct data
         data = {
-            "latitude": lat,
-            "longitude": lng,
-            "altitude": alt,
-            "gps_quality": gps_quality,
-            "hdop": horizontal_dil
+            "lat": randint(44*100, 55*100) / 100,
+            "lng": randint(-110*100, -70*100) / 100,
+            "alt": randint(1000, 2000),
+            "acceleration": {
+                "x": randint(0, 10),
+                "y": randint(0, 10),
+                "z": randint(0, 10)
+            },
+            "orientation": {
+                "x": randint(0, 10),
+                "y": randint(0, 10),
+                "z": randint(0, 10)
+            },
+            "gyro": {
+                "x": randint(0, 10),
+                "y": randint(0, 10),
+                "z": randint(0, 10)
+            },
+            "calibration": {
+                "sys": randint(0, 3),
+                "gyro": randint(0, 3), 
+                "mag": randint(0, 3),
+                "accel": randint(0, 3)
+            },
+            "RSSI": randint(40, 130) * -1,
+            "lastNodeName": "Mobile Node"
         }
 
         # post data
@@ -28,17 +41,6 @@ def main():
             url = endpoint,
             data = data
         )
-
-        # randomize data
-        lat += randint(0, 100) / 100
-        lat %= 90
-
-        lng += randint(0, 100) / 100
-        lng %= 90
-
-        alt += randint(0, 15) 
-        gps_quality += randint(1, 4)
-        horizontal_dil += randint(-10, 10) / 10
 
         sleep(5)
 
