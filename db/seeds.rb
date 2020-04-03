@@ -5,3 +5,12 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+#
+
+# Create a default flight
+if Flight.all.length == 0
+    f = Flight.new
+    f.name = "Default Flight"
+    f.desc = "A default flight for when no other flights exist"
+    f.save!
+end
