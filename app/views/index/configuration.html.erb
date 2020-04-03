@@ -1,13 +1,16 @@
 <%= render partial: "navbar", locals: {active: "config"} %>
 <div class=page-body>
     <hr />
+    <label>Past Flight Data: </label>
     <select class="form-control flight-select">
-        <% for fl in Flight.all %>
+        <% for fl in Flight.all.slice(0, Flight.all.length - 1) %>
             <option><%= fl.name %></option>
         <% end %>
     </select>
     <br />
-    <button id=select-flight class="btn btn-primary">Select This Flight</button>
+    <button id=select-flight class="btn btn-primary">Select This Flight's Data</button>
+    <button id=curr-flight class="btn btn-success">Show Current Flight Data</button>
     <br />
+    <p class=note>Note: All incoming data will be appended to the latest created flight. Past flights are essentially read-only</p>
     <button id=create-flight class="btn btn-lg btn-primary"> Create a new flight </button>
 </div>

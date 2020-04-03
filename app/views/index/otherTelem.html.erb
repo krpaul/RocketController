@@ -3,7 +3,6 @@
     <div class="last-update">
         <span class="under-value slightly-smaller">Last Update: <span class="slightly-smaller" id="last-update">0</span> s</span> 
     </div>
-    <%= @relevantTelem.pluck(:created_at).first %>
     <div class=graph>
         <h2> Acceleration Graph </h2>
         <%= line_chart [

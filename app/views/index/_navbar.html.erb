@@ -5,7 +5,7 @@
 </div>
 
 <div class="title-box navinfo" >
-    <h5>Current Flight: "<%= Flight.all.last.name %>"</h5>
+    <h5>Current Flight: "<span id=flight-name><%= Flight.all.last.name %></span>"</h5>
     <h5>Date: <%= Date.today %></h5>
     <h5>Time: <span id="time"></span></h5>
     <hr />
