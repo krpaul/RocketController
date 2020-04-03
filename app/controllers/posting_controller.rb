@@ -32,19 +32,13 @@ class PostingController < ApplicationController
         
         # set the flight to the last flight
         # if there isn't a last flight, create a default
-        f = nil
-        if Telemetry.all.length == 0
-            df = Flight.where name: "Default Flight"
-            if df.length == 0
-                f = Flight.new
-                f.name = "Default Flight"
-                f.desc = ""
-                f.save
-            else
-                f = df
-            end
+        if Flight.all.length == 0
+            f = Flight.new
+            f.name = "Default Flight"
+            f.desc = ""
+            f.save!
         end
-        t.flight = f
+        t.flight = Flight.all.last
         
         t.save!
         

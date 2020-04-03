@@ -20,6 +20,8 @@ Array.prototype.last = function() {
 // Map
 mapboxgl.accessToken = 'pk.eyJ1Ijoia3JwYXVsIiwiYSI6ImNrMnV4b2w5dTFhbnQzaG50YmppcHVhdWcifQ.rwTKRa2OQmqweeps8ZXELw';
 
+let UPDATE_INTERVAL_MS = 1000;
+
 // Global vars
 let map;
 let initialMapData = [];
@@ -34,16 +36,30 @@ let noDataAlertTimer;
 let noDataHidden = false;
 let timestampLastUpdate = 0;
 let pageType;
+let currentFlight;
 
-function newData(data)
+function verifyPacket(data, oldPacket=false)
 {
-    if (!data // if data does not exist
-        || data == undefined // or is not of the form we want
-        || data.timestamp <= timestampLastUpdate // or is not new
-    )
-    {
-        return // Don't do anything
+    // undef
+    if (!data || data == undefined) {
+        return false
     }
+    // not new
+    else if (!oldPacket && data.timestamp <= timestampLastUpdate) { 
+        return false 
+    } 
+    // not from this flight
+    else if (!oldPacket && currentFlight != "" && data.flight != currentFlight) { 
+        return false 
+    }
+    
+    return true
+}
+
+function newData(data, oldPacket=false) // oldPacket is used to bypass certain checks and appends for when we're browsing old data
+{
+    if (!verifyPacket(data)) 
+    { return }
 
     /* Otherwise ... */
 
@@ -59,11 +75,13 @@ function newData(data)
     $("#latitude-value")[0].innerText  = lat.toFixed(2)
     $("#longitude-value")[0].innerText = lng.toFixed(2)
 
-    // Add pair to lines
-    latlngPairs.push([lat, lng])
-
-    // Add altitude
-    altitudePoints.push(alt)
+    if (!oldPacket) {
+        // Add pair to lines
+        latlngPairs.push([lat, lng])
+    
+        // Add altitude
+        altitudePoints.push(alt)
+    }
 
     // Add a line to the map
     addMapLines(latlngPairs)
@@ -88,14 +106,12 @@ function newData(data)
 
 function newOtherData(data)
 {
-    // is not new
-    if (!data || data == undefined) return
+    if (!verifyPacket(data)) 
+        return
     else if (timestampLastUpdate == 0) {
         timestampLastUpdate = data.timestamp;
         return;
     } 
-    else if (data.timestamp <= timestampLastUpdate)
-    { return } // Don't do anything 
 
     /* Otherwise ... */
 
@@ -176,17 +192,10 @@ function allData(data) // Fills in all data packets from /all request
     updateGeneralTelemetry(data.last())
 }
 
-function checkDataUpdate() {
+function checkDataUpdate(fun) {
     $.ajax({
         url: "/out",
-        success: newData,
-    })    
-}
-
-function checkOtherDataUpdate() {
-    $.ajax({
-        url: "/out",
-        success: newOtherData,
+        success: fun,
     })    
 }
 
@@ -195,7 +204,7 @@ function startup(data)
 {
     // Set all data
     allData(data)
-
+    
     // Create map
     // Note mapbox coord are given at LNG / LAT, not lat/lng
     map = new mapboxgl.Map({
@@ -204,24 +213,27 @@ function startup(data)
         center: [latlngPairs.last()[1], latlngPairs.last()[0]], 
         zoom: 5
     })
-
+    
     map.on('load', 
-        () => {
-            // Create altitude chart
-            createAltChart()
+    () => {
+        // Create altitude chart
+        createAltChart()
+        
+        // load first packet
+        newData(data.last(), true)
 
-            // Let the window check for an update every half second with new data
-            window.setInterval(checkDataUpdate, 500);
-
-            map.loadImage(
+        // Let the window check for an update every half second with new data
+        window.setInterval(() => {checkDataUpdate(newData)}, UPDATE_INTERVAL_MS);
+        
+        map.loadImage(
                 'https://cdn1.iconfinder.com/data/icons/transports-5/66/56-512.png',
                 function(error, image) {
                     if (error) throw error;
                     map.addImage('bln', image);
                 }   
-            );
-        }
-    )
+                );
+            }
+        )
 }
 
 function setup()
@@ -241,20 +253,29 @@ function setup()
 }
 
 document.addEventListener("turbolinks:load", function() { 
-    let pageType= $(".active")[0].id;
+    currentFlight = getCookie("flight")
+
+    if (currentFlight != undefined && currentFlight != "")
+        $("#flight-name")[0].innerText = currentFlight
+    else 
+        currentFlight = "";
+
+    let pageType = $(".active")[0].id;
     switch (pageType) {
 
     case "telemetry":
         // Get all data
         $.ajax({
             url: "/all",
+            data: { "flight": currentFlight },
             success: (data) => {
-                if (data.length != 0) {startup(data);}
-                else { // if no data availible, check for data every 5s
+                if (data.length != 0) { startup(data); }
+                else if (currentFlight == "") { // if no data availible, check for data every 5s (as long we're querying for the current flight)
                     reCheckForData = window.setInterval(
                         () => {
                             $.ajax({
                                 url: "/all",
+                                data: { "flight": currentFlight },
                                 success: (data) => {
                                     if (data.length != 0) {
                                         startup(data); 
@@ -272,12 +293,47 @@ document.addEventListener("turbolinks:load", function() {
 
                 // other setup
                 setup()
-                window.setInterval(function() {updateTimeSinceLastUpdate()}, 1000)
             },
         }) 
+        break;
     case "other":
         setup()
-        window.setInterval(checkOtherDataUpdate, 500);
+        if (currentFlight)
+        {
+            $.post(
+                "/allFlightData",
+                { "flight": currentFlight },
+                (data) => {
+                    var a = Chartkick.charts["accel"]
+                    a.dataSource[0].data = data.acceleration[0];
+                    a.dataSource[1].data = data.acceleration[1];
+                    a.dataSource[2].data = data.acceleration[2];
+        
+                    var g = Chartkick.charts["gyro"]
+                    g.dataSource[0].data = data.gyro[0];
+                    g.dataSource[1].data = data.gyro[1];
+                    g.dataSource[2].data = data.gyro[2];
+        
+                    var o = Chartkick.charts["orientation"]
+                    o.dataSource[0].data = data.orientation[0];
+                    o.dataSource[1].data = data.orientation[1];
+                    o.dataSource[2].data = data.orientation[2];
+        
+                    var r = Chartkick.charts["rssi"]
+                    r.dataSource = data.rssi;
+        
+                    Chartkick.eachChart(function(chart) {
+                        chart.refreshData()
+                        chart.redraw()
+                    })
+                }
+            )
+        }
+        else
+        {
+            window.setInterval(() => {checkDataUpdate(newOtherData)}, UPDATE_INTERVAL_MS);
+        }
+        break;
     case "config":
         $("#create-flight").click(() => {
             var flight = ""
@@ -310,8 +366,22 @@ document.addEventListener("turbolinks:load", function() {
                     }
                 },
             )
-        })
-    }   
+        });
+
+        $("#select-flight").click(() => {
+            currentFlight = $(".flight-select")[0].value;
+            setCookie("flight", currentFlight, 5)
+            $("#flight-name")[0].innerText = currentFlight
+        });
+
+        $("#curr-flight").click(() => {
+            currentFlight = ""
+            setCookie("flight", currentFlight, 1)
+            location.reload()
+            return false
+        });
+        break;
+    }  
 })
         
 /*******************
@@ -467,6 +537,37 @@ function updateTimeSinceLastUpdate()
 function resetTimeSinceLastUpdate()
 { timer.innerText = "0" }
 
+
+function clearNoData()
+{
+    $(".no-data").hide()
+    clearInterval(noDataAlertTimer)
+}
+
+// https://www.w3schools.com/js/js_cookies.asp
+function setCookie(cname, cvalue, exdays) {
+    console.log("setting cookie: ", cname, " value: ", cvalue)
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 /*******************
     Button Methods 
 *******************/
@@ -534,10 +635,4 @@ function noDataAlert()
             noDataHidden = !noDataHidden
         }
     }, 1000)
-}
-
-function clearNoData()
-{
-    $(".no-data").hide()
-    clearInterval(noDataAlertTimer)
 }

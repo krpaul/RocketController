@@ -27,7 +27,13 @@ class IndexController < ApplicationController
 
     # returns the whole database
     def allData
-        return render json: Flight.all.last.telemetries.map {|s| reconstructJSON s }
+        f = nil
+        if params[:flight] && params[:flight] != ""
+            f = Flight.where(:name == params[:flight])[0]
+        else
+            f = Flight.all.last
+        end
+        return render json: f.telemetries.map {|s| reconstructJSON s }
     end
 
     # creates a new flight
@@ -43,12 +49,39 @@ class IndexController < ApplicationController
         return render json: {"exists": Flight.where(name: params[:name]).length != 0}
     end
 
-    def setFlight
-    end
+    
+    def getAllFlightData
+        data = Flight.where(name: params[:flight])[0].telemetries
+        p "DATA:", data
+        aData = [data.pluck(:created_at, :accelerationX),
+                data.pluck(:created_at, :accelerationY),
+                data.pluck(:created_at, :accelerationZ)]
 
+        gData = [data.pluck(:created_at, :gyroX),
+                data.pluck(:created_at, :gyroY),
+                data.pluck(:created_at, :gyroZ)]
+
+        oData = [data.pluck(:created_at, :orientationX),
+                data.pluck(:created_at, :orientationY),
+                data.pluck(:created_at, :orientationZ)]
+
+        rData = data.pluck(:created_at, :rssi)
+
+        return render json: {
+            "acceleration": aData,
+            "gyro": gData,
+            "orientation": oData,
+            "rssi": rData
+        }
+    end
+        
     # clears the database
     def reset
-        Telemetry.delete_all
+        for f in Flight.all
+            f.telemetries.delete_all
+        end
+        Flight.delete_all
+
         return redirect_to '/'
     end
 end
