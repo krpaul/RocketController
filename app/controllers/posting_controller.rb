@@ -10,24 +10,24 @@ class PostingController < ApplicationController
         t.lng = params[:lng]
         t.alt = params[:alt]
 
-        t.accelerationX = params[:acceleration][:x]
-        t.accelerationY = params[:acceleration][:y]
-        t.accelerationZ = params[:acceleration][:z]
+        t.accelerationX = params[:acceleration][:x].to_f
+        t.accelerationY = params[:acceleration][:y].to_f
+        t.accelerationZ = params[:acceleration][:z].to_f
 
-        t.gyroX = params[:gyro][:x]
-        t.gyroY = params[:gyro][:y]
-        t.gyroZ = params[:gyro][:z]
+        t.gyroX = params[:gyro][:x].to_f
+        t.gyroY = params[:gyro][:y].to_f
+        t.gyroZ = params[:gyro][:z].to_f
 
-        t.orientationX = params[:orientation][:x]
-        t.orientationY = params[:orientation][:y]
-        t.orientationZ = params[:orientation][:z]
+        t.orientationX = params[:orientation][:x].to_f
+        t.orientationY = params[:orientation][:y].to_f
+        t.orientationZ = params[:orientation][:z].to_f
 
-        t.calib_SYS = params[:calibration][:sys]
-        t.calib_MAG = params[:calibration][:mag]
-        t.calib_GYRO = params[:calibration][:gyro]
-        t.calib_ACCEL = params[:calibration][:accel]
+        t.calib_SYS = params[:calibration][:sys].to_i
+        t.calib_MAG = params[:calibration][:mag].to_i
+        t.calib_GYRO = params[:calibration][:gyro].to_i
+        t.calib_ACCEL = params[:calibration][:accel].to_i
 
-        t.RSSI = params[:RSSI]
+        t.RSSI = params[:RSSI].to_i
         t.lastNodeName = (params.has_key? :lastNodeName) ? params[:lastNodeName] : "Unknown"
         
         # set the flight to the last flight
