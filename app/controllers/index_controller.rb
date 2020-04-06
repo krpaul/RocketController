@@ -74,14 +74,4 @@ class IndexController < ApplicationController
             "rssi": rData
         }
     end
-        
-    # clears the database
-    def reset
-        for f in Flight.all
-            f.telemetries.delete_all
-        end
-        Flight.delete_all
-
-        return redirect_to '/'
-    end
 end
