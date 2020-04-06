@@ -123,6 +123,11 @@ document.addEventListener("turbolinks:load", function() {
             clearInterval(dataCheck)
             dataCheck = window.setInterval(() => {checkDataUpdate(newOtherData)}, UPDATE_INTERVAL_MS);
         }
+
+        Chartkick.eachChart(function(chart) {
+            console.log(chart)
+            chart.chart.xAxis[0].visible = false;
+        })
         break;
 
     case "config":
