@@ -1,6 +1,7 @@
 from random import randint, uniform
 from time import sleep
 import requests as r
+import json
 
 def main():
     endpoint = "http://51.161.8.25/in"
@@ -39,8 +40,11 @@ def main():
         # post data
         response = r.post(
             url = endpoint,
-            data = data
+            json = data
         )
+        
+        print("sent data")
+        print(response.text)
 
         sleep(5)
 

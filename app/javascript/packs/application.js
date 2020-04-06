@@ -38,6 +38,7 @@ let timestampLastUpdate = 0;
 let pageType;
 let currentFlight;
 let updateInterval;
+let dataCheck;
 
 document.addEventListener("turbolinks:load", function() { 
     currentFlight = getCookie("flight")
@@ -47,7 +48,7 @@ document.addEventListener("turbolinks:load", function() {
     else 
         currentFlight = "";
 
-    let pageType = $(".active")[0].id;
+    pageType = $(".active")[0].id;
     switch (pageType) {
 
     case "telemetry":
@@ -119,7 +120,8 @@ document.addEventListener("turbolinks:load", function() {
         }
         else
         {
-            window.setInterval(() => {checkDataUpdate(newOtherData)}, UPDATE_INTERVAL_MS);
+            clearInterval(dataCheck)
+            dataCheck = window.setInterval(() => {checkDataUpdate(newOtherData)}, UPDATE_INTERVAL_MS);
         }
         break;
 
@@ -361,7 +363,8 @@ function startup(data)
         updateGeneralTelemetry(data.last())
 
         // Let the window check for an update every half second with new data
-        window.setInterval(() => {checkDataUpdate(newData)}, UPDATE_INTERVAL_MS);
+        clearInterval(dataCheck)
+        dataCheck = window.setInterval(() => {checkDataUpdate(newData)}, UPDATE_INTERVAL_MS);
         
         map.loadImage(
                 'https://cdn1.iconfinder.com/data/icons/transports-5/66/56-512.png',
@@ -387,6 +390,9 @@ function setup()
 
     // time display
     startTime()
+
+    // incase it is still running 
+    clearInterval(reCheckForData)
 }
 
         
@@ -414,7 +420,6 @@ function addMapLines(lines)
     }
 
     var newLines = lines.map(x => [x[1], x[0]])  // flip lat/lng
-    console.log(newLines)
     
     // point
     map.addSource('balloon', {
@@ -561,7 +566,6 @@ function clearNoData()
 
 // https://www.w3schools.com/js/js_cookies.asp
 function setCookie(cname, cvalue, exdays) {
-    console.log("setting cookie: ", cname, " value: ", cvalue)
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toUTCString();
