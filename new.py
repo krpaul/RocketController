@@ -4,8 +4,8 @@ import requests as r
 import json
 
 def main():
-    endpoint = "http://51.161.8.25/in"
-
+    endpoint = "http://localhost:3000/in"
+    
     while True:
         # construct data
         data = {

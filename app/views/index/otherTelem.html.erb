@@ -6,41 +6,49 @@
     <div class=graph>
         <h2> Acceleration Graph </h2>
         <%= line_chart [
-                {name: "X", data: @relevantTelem.pluck(:created_at, :accelerationX), color: "#f00"},
-                {name: "Y", data: @relevantTelem.pluck(:created_at, :accelerationY), color: "#06f"},
-                {name: "Z", data: @relevantTelem.pluck(:created_at, :accelerationZ), color: "#0f0"}
+                {name: "X", data: formatTime(@relevantTelem.pluck(:created_at, :accelerationX)), color: "#f00"},
+                {name: "Y", data: formatTime(@relevantTelem.pluck(:created_at, :accelerationY)), color: "#06f"},
+                {name: "Z", data: formatTime(@relevantTelem.pluck(:created_at, :accelerationZ)), color: "#0f0"}
             ], 
             xtitle: "Time", ytitle: "m/s²",
-            id: "accel"
+            id: "accel", height: "40em",
+            discrete: true,
+            library: {:xAxis => {:visible => false}}
         %>
     </div>
     <div class=graph>
         <h2> Gyro Graph </h2>
         <%= line_chart [
-                {name: "X", data: @relevantTelem.pluck(:created_at, :gyroX), color: "#f00"},
-                {name: "Y", data: @relevantTelem.pluck(:created_at, :gyroY), color: "#06f"},
-                {name: "Z", data: @relevantTelem.pluck(:created_at, :gyroZ), color: "#0f0"}
+                {name: "X", data: formatTime(@relevantTelem.pluck(:created_at, :gyroX)), color: "#f00"},
+                {name: "Y", data: formatTime(@relevantTelem.pluck(:created_at, :gyroY)), color: "#06f"},
+                {name: "Z", data: formatTime(@relevantTelem.pluck(:created_at, :gyroZ)), color: "#0f0"}
             ], 
             xtitle: "Time", ytitle: "°",
-            id: "gyro"
+            id: "gyro", height: "40em",
+            discrete: true,
+            library: {:xAxis => {:visible => false}}
         %>
     </div>
     <div class=graph>
         <h2> Orientation Graph </h2>
         <%= line_chart [
-                {name: "X", data: @relevantTelem.pluck(:created_at, :orientationX), color: "#f00"},
-                {name: "Y", data: @relevantTelem.pluck(:created_at, :orientationY), color: "#06f"},
-                {name: "Z", data: @relevantTelem.pluck(:created_at, :orientationZ), color: "#0f0"}
+                {name: "X", data: formatTime(@relevantTelem.pluck(:created_at, :orientationX)), color: "#f00"},
+                {name: "Y", data: formatTime(@relevantTelem.pluck(:created_at, :orientationY)), color: "#06f"},
+                {name: "Z", data: formatTime(@relevantTelem.pluck(:created_at, :orientationZ)), color: "#0f0"}
             ], 
             xtitle: "Time", ytitle: "(deg/s)",
-            id: "orientation"
+            id: "orientation", height: "40em",
+            discrete: true,
+            library: {:xAxis => {:visible => false}}
         %>
     </div>
     <div class=graph>
         <h2> RSSI Graph </h2>
-        <%= line_chart @relevantTelem.pluck(:created_at, :rssi), 
+        <%= line_chart formatTime(@relevantTelem.pluck(:created_at, :rssi)), 
             xtitle: "Time", ytitle: "RSSI",
-            id: "rssi"
+            id: "rssi",
+            discrete: true,
+            library: {:xAxis => {:visible => false}}
         %>
     </div>
 </div>
