@@ -51,4 +51,14 @@
             library: {:xAxis => {:visible => false}}
         %>
     </div>
+    <div class=graph>
+        <h2> Altitude Graph </h2>
+        <%= line_chart formatTime(@relevantTelem.pluck(:created_at, :alt)), 
+            xtitle: "Time", ytitle: "m",
+            colors: ["#f90"],
+            id: "alt",
+            discrete: true,
+            library: {:xAxis => {:visible => false}}
+        %>
+    </div>
 </div>

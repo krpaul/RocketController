@@ -5,10 +5,11 @@ class IndexController < ApplicationController
     $data = nil
 
     def index
+        @altTelem = getTelem().group_by_minute(:created_at).pluck(:created_at, :alt)
     end
 
     def otherTelem
-        @relevantTelem = Flight.all.last.telemetries
+        @relevantTelem = getTelem
     end
 
     def configuration
@@ -73,5 +74,10 @@ class IndexController < ApplicationController
             "orientation": oData,
             "rssi": rData
         }
+    end
+
+    private 
+    def getTelem
+        Flight.all.last.telemetries
     end
 end
