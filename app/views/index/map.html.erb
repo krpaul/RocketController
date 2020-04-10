@@ -1,4 +1,19 @@
-<%= render partial: "navbar", locals: {active: "map"} %>
-<div class=page-body>
-    dis da map
+<%= render partial: "navbar", locals: {active: "mapPage"} %>
+<div class="page-body">
+    <div id=bigmap></div>
+
+    <button class="map-button" id="reset-zoom">Reset Zoom</button>
+    <button class="map-button" id="go-to-balloon">Go To Balloon</button>
+    
+    <h3 class=gpsheader>GPS Info</h3>
+    <div class=map-group>
+        <h4>Balloon</h4>
+        <h5>Lat: <span id="latitude-value">~</span></h5>
+        <h5>Lng: <span id="longitude-value">~</span></h5>
+    </div>
+    <div class=map-group>
+        <h4>Tracking Unit</h4>
+        <h5>Lat: <span id="latitude-value_tracking">~</span></h5>
+        <h5>Lng: <span id="longitude-value_tracking">~</span></h5>
+    </div>
 </div>
