@@ -50,39 +50,9 @@ document.addEventListener("turbolinks:load", function() {
     switch (pageType) {
 
     case "telemetry":
-        // Get all data
-        $.ajax({
-            url: "/all",
-            data: { "flight": currentFlight },
-            success: (data) => {
-                if (data.length != 0) { startup(data); }
-                else if (currentFlight == "") { // if no data availible, check for data every 5s (as long we're querying for the current flight)
-                    reCheckForData = window.setInterval(
-                        () => {
-                            $.ajax({
-                                url: "/all",
-                                data: { "flight": currentFlight },
-                                success: (data) => {
-                                    if (data.length != 0) {
-                                        startup(data); 
-                                        clearInterval(reCheckForData);
-                                        clearNoData();
-                                    }
-                                }
-                            })
-                        }, 
-                        5000);
-                        
-                        // Set no data alerts
-                        noDataAlert()
-                 }
-
-                // other setup
-                setup()
-            },
-        }) 
+    case "mapPage": 
+        initialzeGeneralTelemetry()
         break;
-
     case "other":
         setup()
         if (currentFlight)
@@ -123,7 +93,6 @@ document.addEventListener("turbolinks:load", function() {
         }
 
         Chartkick.eachChart(function(chart) {
-            console.log(chart)
             chart.chart.xAxis[0].visible = false;
         })
         break;
@@ -178,6 +147,41 @@ document.addEventListener("turbolinks:load", function() {
     }  
 })
 
+function initialzeGeneralTelemetry()
+{
+    // Get all data
+    $.ajax({
+        url: "/all",
+        data: { "flight": currentFlight },
+        success: (data) => {
+            if (data.length != 0) { startup(data); }
+            else if (currentFlight == "") { // if no data availible, check for data every 5s (as long we're querying for the current flight)
+                reCheckForData = window.setInterval(
+                    () => {
+                        $.ajax({
+                            url: "/all",
+                            data: { "flight": currentFlight },
+                            success: (data) => {
+                                if (data.length != 0) {
+                                    startup(data); 
+                                    clearInterval(reCheckForData);
+                                    clearNoData();
+                                }
+                            }
+                        })
+                    }, 
+                    5000);
+                    
+                    // Set no data alerts
+                    noDataAlert()
+            }
+
+            // other setup
+            setup()
+        },
+    }) 
+}
+
 function verifyPacket(data)
 {
     // undef
@@ -220,16 +224,10 @@ function newData(data)
     // Add a line to the map
     addMapLines(latlngPairs)
 
-    // Update Altitude Chart
-    // chart.data[0].addTo("dataPoints", altitudePoints.last())
-    // chart.options.data[0].dataPoints[length-1].y = altitudePoints.last()
-    
     map.jumpTo({
         center: [lng, lat]
     })
     
-    // update chart
-
     // general telem
     updateGeneralTelemetry(data)
 
@@ -282,35 +280,38 @@ function updateGeneralTelemetry(packet)
     var alt = parseFloat(packet.alt)
     var lat = parseFloat(packet.lat)
     var lng = parseFloat(packet.lng)
-
-    $("#altitude-value")[0].innerText  = alt.toFixed(1)
+    
     $("#latitude-value")[0].innerText  = lat.toFixed(2)
     $("#longitude-value")[0].innerText = lng.toFixed(2)
-
-    // update acceleration vect
-    $("#accel-x")[0].innerText = packet.acceleration.x
-    $("#accel-y")[0].innerText = packet.acceleration.y
-    $("#accel-z")[0].innerText = packet.acceleration.z
     
-    // update orientation
-    $("#orient-x")[0].innerText = packet.orientation.x
-    $("#orient-y")[0].innerText = packet.orientation.y
-    $("#orient-z")[0].innerText = packet.orientation.z
+    if (pageType != 'mapPage') {
+        $("#altitude-value")[0].innerText  = alt.toFixed(1)
     
-    // update gryo
-    $("#gyro-x")[0].innerText = packet.gyro.x
-    $("#gyro-y")[0].innerText = packet.gyro.y
-    $("#gyro-z")[0].innerText = packet.gyro.z
-
-    // update calib
-    $("#calib-sys")[0].innerText = packet.calibration.sys
-    $("#calib-mag")[0].innerText = packet.calibration.mag
-    $("#calib-gyro")[0].innerText = packet.calibration.gyro
-    $("#calib-accel")[0].innerText = packet.calibration.accel
-
-    // transmission info
-    $("#last-node")[0].innerText = packet.lastNodeName
-    $("#last-rssi")[0].innerText = packet.RSSI
+        // update acceleration vect
+        $("#accel-x")[0].innerText = packet.acceleration.x
+        $("#accel-y")[0].innerText = packet.acceleration.y
+        $("#accel-z")[0].innerText = packet.acceleration.z
+        
+        // update orientation
+        $("#orient-x")[0].innerText = packet.orientation.x
+        $("#orient-y")[0].innerText = packet.orientation.y
+        $("#orient-z")[0].innerText = packet.orientation.z
+        
+        // update gryo
+        $("#gyro-x")[0].innerText = packet.gyro.x
+        $("#gyro-y")[0].innerText = packet.gyro.y
+        $("#gyro-z")[0].innerText = packet.gyro.z
+    
+        // update calib
+        $("#calib-sys")[0].innerText = packet.calibration.sys
+        $("#calib-mag")[0].innerText = packet.calibration.mag
+        $("#calib-gyro")[0].innerText = packet.calibration.gyro
+        $("#calib-accel")[0].innerText = packet.calibration.accel
+    
+        // transmission info
+        $("#last-node")[0].innerText = packet.lastNodeName
+        $("#last-rssi")[0].innerText = packet.RSSI
+    }
 }
 
 function allData(data) // Fills in all data packets from /all request
@@ -345,16 +346,25 @@ function startup(data)
 {
     // Set all data
     allData(data)
-    
+
     // Create map
     // Note mapbox coord are given at LNG / LAT, not lat/lng
     map = new mapboxgl.Map({
-        container: 'map', // HTML container ID
+        container: pageType == "mapPage" ? 'bigmap' : "map", // HTML container ID
         style: 'mapbox://styles/mapbox/streets-v9', // style URL
         center: [latlngPairs.last()[1], latlngPairs.last()[0]], 
         zoom: 5
     })
     
+    var loadimg = () => {
+        map.loadImage(
+            'https://cdn1.iconfinder.com/data/icons/transports-5/66/56-512.png',
+            function(error, image) {
+                if (error) throw error;
+                map.addImage('bln', image);
+        });
+    }
+
     map.on('load', 
     () => {
         // load first packet
@@ -364,28 +374,27 @@ function startup(data)
         clearInterval(dataCheck)
         dataCheck = window.setInterval(() => {checkDataUpdate(newData)}, UPDATE_INTERVAL_MS);
         
-        map.loadImage(
-            'https://cdn1.iconfinder.com/data/icons/transports-5/66/56-512.png',
-            function(error, image) {
-                if (error) throw error;
-                map.addImage('bln', image);
-        });
+        loadimg()
 
         addMapLines(latlngPairs)
-        }
-    )
+    })
 }
 
 function setup()
 /* Stuff that doesn't require data */
 {
+    // clear old stuff
+    clearInterval(updateInterval)
+
     // Set button events
     setElements()
 
-    // Timer
-    resetTimeSinceLastUpdate()
-
-    setTimeSinceLastUpdate()
+    if (pageType != "mapPage")
+    {
+        // Timer
+        resetTimeSinceLastUpdate()
+        setTimeSinceLastUpdate()
+    }
 
     // time display
     startTime()
@@ -437,6 +446,7 @@ function addMapLines(lines)
         }
     });
 
+    // add balloon icon
     map.addLayer({
         'id': 'balloon-point',
         'type': 'symbol',
