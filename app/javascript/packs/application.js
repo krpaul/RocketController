@@ -24,10 +24,8 @@ let UPDATE_INTERVAL_MS = 1000;
 
 // Global vars
 let map;
-let initialMapData = [];
 let altitudePoints = [];
 let latlngPairs = [];
-let chart;
 let timer;
 let clockTimer;
 let reCheckForData;
@@ -198,7 +196,7 @@ function verifyPacket(data)
     return true
 }
 
-function newData(data) // oldPacket is used to bypass certain checks and appends for when we're browsing old data
+function newData(data) 
 {
     if (!verifyPacket(data)) 
     { return }
@@ -231,9 +229,8 @@ function newData(data) // oldPacket is used to bypass certain checks and appends
     })
     
     // update chart
-    chart.options.data[0].dataPoints.push({ y: altitudePoints.last(), x: data.timestamp})
-    chart.render()
 
+    // general telem
     updateGeneralTelemetry(data)
 
     // reset timer
@@ -328,7 +325,6 @@ function allData(data) // Fills in all data packets from /all request
         var lng = parseFloat(packet.lng)
         
         // Insert into arrays
-        initialMapData.push({y: alt, x: packet.timestamp})
         altitudePoints.push(alt)
         latlngPairs.push([lat, lng])
     })
@@ -361,9 +357,6 @@ function startup(data)
     
     map.on('load', 
     () => {
-        // Create altitude chart
-        createAltChart()
-        
         // load first packet
         updateGeneralTelemetry(data.last())
 
@@ -372,14 +365,15 @@ function startup(data)
         dataCheck = window.setInterval(() => {checkDataUpdate(newData)}, UPDATE_INTERVAL_MS);
         
         map.loadImage(
-                'https://cdn1.iconfinder.com/data/icons/transports-5/66/56-512.png',
-                function(error, image) {
-                    if (error) throw error;
-                    map.addImage('bln', image);
-                }   
-                );
-            }
-        )
+            'https://cdn1.iconfinder.com/data/icons/transports-5/66/56-512.png',
+            function(error, image) {
+                if (error) throw error;
+                map.addImage('bln', image);
+        });
+
+        addMapLines(latlngPairs)
+        }
+    )
 }
 
 function setup()
@@ -481,70 +475,6 @@ function addMapLines(lines)
     )  
 }
             
-function createAltChart() 
-{
-    chart = new CanvasJS.Chart("altGraph", { 
-        axisX: {
-            title: "Time",
-            labelFormatter: formatUnixTime
-        },
-        axisY: {
-            title: "Meters",
-            suffix: "m"
-        },
-        toolTip: {
-            contentFormatter: toolTipFormatter
-        },
-		data: [{
-            type: "line",
-            dataPoints: initialMapData
-        }],
-    });
-    
-    chart.render();
-}
-
-function formatUnixTime(args, mode=0) 
-/*
-mode=0 -> HH:MM
-mode=1 -> MM:SS
-*/
-{
-    if (!args) return
-    
-    // If given as part of an object, or as just the value
-    var value = args.value || args
-    
-    var date = new Date(value * 1000)
-    
-    switch (mode)
-    {
-        default: 
-        case 0: 
-        return `${date.getHours()}h ${date.getMinutes()}m`
-        case 1:
-            return `${date.getMinutes()}m ${date.getSeconds()}s`
-        }
-}
-
-function toolTipFormatter(e)
-{
-    var content = "";
-    for (var i = 0; i < e.entries.length; i++) {
-        
-        // Create html for this tooltip entry
-        var current = 
-        `<strong>
-        ${formatUnixTime(e.entries[i].dataPoint.x, mode=1)}
-        </strong>, 
-        ${e.entries[i].dataPoint.y}m`
-        
-        // Append to overarching string
-        content += current + "<br />"
-    }
-    return content
-}
-
 function setTimeSinceLastUpdate()
 {
     // Last time update (and remove mapbox credit)

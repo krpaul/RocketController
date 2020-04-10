@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   get '/telemetry', to: "index#index"
   get '/telemetry/other', to: "index#otherTelem"
   get '/configuration', to: "index#configuration"
+  get '/map', to: "index#map"
   
   get '/reset', to: "index#reset"
   

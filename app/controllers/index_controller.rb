@@ -15,6 +15,9 @@ class IndexController < ApplicationController
     def configuration
     end
 
+    def map
+    end
+
     # gives latest data; will be requested by ajax
     def outData 
         # doesn't get logged because this request comes in multiple times per second
