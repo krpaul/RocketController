@@ -38,6 +38,8 @@ ActiveRecord::Schema.define(version: 2020_03_30_025924) do
     t.integer "calib_ACCEL"
     t.integer "RSSI"
     t.string "lastNodeName"
+    t.float "receiver_lat"
+    t.float "receiver_lng"
     t.integer "flight_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

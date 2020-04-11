@@ -3,14 +3,20 @@ from time import sleep
 import requests as r
 import json
 
+def rn():
+    return randint(0, 10000) / 10000
+
 def main():
     endpoint = "http://localhost:3000/in"
     
+    Lat = Lat1 = 51.13234
+    Lng = Lng1 = -114.4243
+
     while True:
         # construct data
         data = {
-            "lat": randint(44*100, 55*100) / 100,
-            "lng": randint(-110*100, -70*100) / 100,
+            "lat": Lat,
+            "lng": Lng,
             "alt": randint(1000, 2000),
             "acceleration": {
                 "x": randint(0, 10),
@@ -34,8 +40,17 @@ def main():
                 "accel": randint(0, 3)
             },
             "RSSI": randint(40, 130) * -1,
-            "lastNodeName": "Mobile Node"
+            "lastNodeName": "Mobile Node",
+            "receiver": {
+                "lat": Lat1,
+                "lng": Lng1 
+            }
         }
+
+        Lat += rn()
+        Lng += rn()
+        Lat1 += rn()
+        Lng1 += rn()
 
         # post data
         response = r.post(

@@ -29,6 +29,9 @@ class PostingController < ApplicationController
 
         t.RSSI = params[:RSSI].to_i
         t.lastNodeName = (params.has_key? :lastNodeName) ? params[:lastNodeName] : "Unknown"
+
+        t.receiver_lat = params[:receiver][:lat]
+        t.receiver_lng = params[:receiver][:lng]
         
         # set the flight to the last flight
         # if there isn't a last flight, create a default

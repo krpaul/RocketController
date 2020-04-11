@@ -27,6 +27,10 @@ class ApplicationController < ActionController::Base
             },
             "RSSI": db_col.RSSI,
             "lastNodeName": db_col.lastNodeName,
+            "receiver" => {
+                "lat" => db_col.receiver_lat,
+                "lng" => db_col.receiver_lng
+            },
             "flight": db_col.flight.name,
             # add timestamps
             "timestamp" => db_col.created_at.to_time.to_i,

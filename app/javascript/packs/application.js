@@ -26,10 +26,10 @@ let UPDATE_INTERVAL_MS = 1000;
 let map;
 let altitudePoints = [];
 let latlngPairs = [];
+let latlngPairs_tracker = [];
 let timer;
 let clockTimer;
 let reCheckForData;
-let mode;
 let noDataAlertTimer; 
 let noDataHidden = false;
 let timestampLastUpdate = 0;
@@ -220,20 +220,32 @@ function newData(data)
 
     // Add altitude
     altitudePoints.push(alt)
-
-    // Add a line to the map
-    addMapLines(latlngPairs)
-
-    map.jumpTo({
-        center: [lng, lat]
-    })
     
     // general telem
     updateGeneralTelemetry(data)
+    
+    if (pageType == "mapPage")
+    {
+        var lat1 = parseFloat(data.receiver.lat)
+        var lng1 = parseFloat(data.receiver.lng)
+        
+        latlngPairs_tracker.push([lat1, lng1])
+    }
+    else
+    {
+        // reset timer
+        resetTimeSinceLastUpdate()
+        setTimeSinceLastUpdate()
+    }
 
-    // reset timer
-    resetTimeSinceLastUpdate()
-    setTimeSinceLastUpdate()
+    // Add a line to the map
+    addMapLines()
+
+    // Jump if we're not on the big map
+    if (pageType != "mapPage")
+        map.jumpTo({
+            center: [lng, lat]
+        })
 }
 
 function newOtherData(data)
@@ -277,14 +289,17 @@ function newOtherData(data)
 
 function updateGeneralTelemetry(packet)
 {
-    var alt = parseFloat(packet.alt)
     var lat = parseFloat(packet.lat)
     var lng = parseFloat(packet.lng)
     
     $("#latitude-value")[0].innerText  = lat.toFixed(2)
     $("#longitude-value")[0].innerText = lng.toFixed(2)
     
-    if (pageType != 'mapPage') {
+    if (pageType == 'mapPage') {
+        $("#latitude-value_tracking")[0].innerHTML = packet.receiver.lat
+        $("#longitude-value_tracking")[0].innerHTML = packet.receiver.lng
+    } else  {
+        var alt = parseFloat(packet.alt)
         $("#altitude-value")[0].innerText  = alt.toFixed(1)
     
         // update acceleration vect
@@ -328,6 +343,14 @@ function allData(data) // Fills in all data packets from /all request
         // Insert into arrays
         altitudePoints.push(alt)
         latlngPairs.push([lat, lng])
+
+        if (pageType == "mapPage")
+        {
+            var lat1 = parseFloat(packet.receiver.lat)
+            var lng1 = parseFloat(packet.receiver.lng)
+            
+            latlngPairs_tracker.push([lat1, lng1])
+        }
     })
 
     // fill in gen. telemetry with latest packet
@@ -355,15 +378,6 @@ function startup(data)
         center: [latlngPairs.last()[1], latlngPairs.last()[0]], 
         zoom: 5
     })
-    
-    var loadimg = () => {
-        map.loadImage(
-            'https://cdn1.iconfinder.com/data/icons/transports-5/66/56-512.png',
-            function(error, image) {
-                if (error) throw error;
-                map.addImage('bln', image);
-        });
-    }
 
     map.on('load', 
     () => {
@@ -374,9 +388,23 @@ function startup(data)
         clearInterval(dataCheck)
         dataCheck = window.setInterval(() => {checkDataUpdate(newData)}, UPDATE_INTERVAL_MS);
         
-        loadimg()
+        // add balloon icon
+        map.loadImage(
+            'https://cdn1.iconfinder.com/data/icons/transports-5/66/56-512.png',
+            function(error, image) {
+                if (error) throw error;
+                map.addImage('bln', image);
+        });
 
-        addMapLines(latlngPairs)
+        // add tracker icon
+        map.loadImage(
+            'https://cdn3.iconfinder.com/data/icons/geek-3/24/Star-Trek_logo_geek_movie-512.png',
+            function(error, image) {
+                if (error) throw error;
+                map.addImage('tkr', image);
+        });
+
+        addMapLines()
     })
 }
 
@@ -409,7 +437,7 @@ function setup()
 *******************/
 
 // `lines` is an array of [lat, lng] pairs
-function addMapLines(lines)
+function addMapLines()
 {
     // Quick and dirty approach to this function:
     // deleting and recreating the layer each time, 
@@ -426,8 +454,22 @@ function addMapLines(lines)
         map.removeLayer('balloon-point')
         map.removeSource('balloon')
     }
+    
 
-    var newLines = lines.map(x => [x[1], x[0]])  // flip lat/lng
+    if (map.getLayer('tracker-route')) 
+    {
+        map.removeLayer('tracker-route')
+        map.removeSource('tracker-route')
+    }
+
+    if (map.getLayer('tracker-point'))
+    {
+        map.removeLayer('tracker-point')
+        map.removeSource('tracker')
+    }
+    
+    /* add balloon info */
+    var newLines = latlngPairs.map(x => [x[1], x[0]])  // flip lat/lng
     
     // point
     map.addSource('balloon', {
@@ -458,9 +500,64 @@ function addMapLines(lines)
     });
 
     // lines
-    map.addLayer(
-        {
-            "id": "route",
+    map.addLayer({
+        "id": "route",
+        "type": "line",
+        "source": {
+            "type": "geojson",
+            "data": {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": newLines
+                }
+            }
+        },
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "#F00",
+            "line-width": 2
+        }
+    })  
+
+    if (pageType == "mapPage")
+    {
+        /* add tracker info */
+        var newLines_t = latlngPairs_tracker.map(x => [x[1], x[0]])  // flip lat/lng
+        map.addSource('tracker', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': newLines_t.last()
+                        }
+                    }
+                ]
+            }
+        });
+    
+        // add tracker icon
+        map.addLayer({
+            'id': 'tracker-point',
+            'type': 'symbol',
+            'source': 'tracker',
+            'layout': {
+                'icon-image': 'tkr',
+                'icon-size': 0.05,
+            }
+        });
+    
+        // lines
+        map.addLayer({
+            "id": "tracker-route",
             "type": "line",
             "source": {
                 "type": "geojson",
@@ -469,7 +566,7 @@ function addMapLines(lines)
                     "properties": {},
                     "geometry": {
                         "type": "LineString",
-                        "coordinates": newLines
+                        "coordinates": newLines_t
                     }
                 }
             },
@@ -478,11 +575,11 @@ function addMapLines(lines)
                 "line-cap": "round"
             },
             "paint": {
-                "line-color": "#F00",
+                "line-color": "#1a53ff",
                 "line-width": 2
             }
-        }
-    )  
+        })
+    }
 }
             
 function setTimeSinceLastUpdate()
@@ -561,11 +658,7 @@ function removeCredit()
 function setElements()
 {
     $("#reset-zoom").click(_resetZoom)
-    
-    $("#go-to-balloon").click(function() {
-        _goTo()
-        _resetZoom()
-    })
+    $("#go-to-balloon").click(_goTo)
     
     timer = $("#last-update")[0]
 }
