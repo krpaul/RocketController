@@ -10,6 +10,10 @@ class IndexController < ApplicationController
 
     def otherTelem
         @relevantTelem = getTelem
+        @graphSettings = {
+            :xAxis => {:visible => false},
+            :chart => {:animation => false}
+        }
     end
 
     def configuration

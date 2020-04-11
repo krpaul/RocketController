@@ -283,7 +283,6 @@ function newOtherData(data)
 
     Chartkick.eachChart(function(chart) {
         chart.refreshData()
-        chart.redraw()
     })
 }
 
