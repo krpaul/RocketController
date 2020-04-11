@@ -4,7 +4,7 @@ require 'json'
 class IndexController < ApplicationController
     $data = nil
 
-    def index
+    def index 
         @altTelem = getTelem().group_by_minute(:created_at).pluck(:created_at, :alt)
     end
 
