@@ -20,7 +20,7 @@ Array.prototype.last = function() {
 // Map
 mapboxgl.accessToken = 'pk.eyJ1Ijoia3JwYXVsIiwiYSI6ImNrMnV4b2w5dTFhbnQzaG50YmppcHVhdWcifQ.rwTKRa2OQmqweeps8ZXELw';
 
-let UPDATE_INTERVAL_MS = 1000;
+let UPDATE_INTERVAL_MS = 5 * 1000;
 
 // Global vars
 let map;
@@ -55,48 +55,7 @@ document.addEventListener("turbolinks:load", function() {
         break;
     case "other":
         setup()
-        if (currentFlight)
-        {
-            $.post(
-                "/allFlightData",
-                { "flight": currentFlight },
-                (data) => {
-                    var a = Chartkick.charts["accel"]
-                    a.dataSource[0].data = data.acceleration[0];
-                    a.dataSource[1].data = data.acceleration[1];
-                    a.dataSource[2].data = data.acceleration[2];
-        
-                    var g = Chartkick.charts["gyro"]
-                    g.dataSource[0].data = data.gyro[0];
-                    g.dataSource[1].data = data.gyro[1];
-                    g.dataSource[2].data = data.gyro[2];
-        
-                    var o = Chartkick.charts["orientation"]
-                    o.dataSource[0].data = data.orientation[0];
-                    o.dataSource[1].data = data.orientation[1];
-                    o.dataSource[2].data = data.orientation[2];
-        
-                    var r = Chartkick.charts["rssi"]
-                    r.dataSource = data.rssi;
-        
-                    Chartkick.eachChart(function(chart) {
-                        chart.refreshData()
-                        chart.redraw()
-                    })
-                }
-            )
-        }
-        else
-        {
-            clearInterval(dataCheck)
-            dataCheck = window.setInterval(() => {checkDataUpdate(newOtherData)}, UPDATE_INTERVAL_MS);
-        }
-
-        Chartkick.eachChart(function(chart) {
-            chart.chart.xAxis[0].visible = false;
-        })
         break;
-
     case "config":
         $("#create-flight").click(() => {
             var flight = ""
@@ -246,44 +205,6 @@ function newData(data)
         map.jumpTo({
             center: [lng, lat]
         })
-}
-
-function newOtherData(data)
-{
-    if (!verifyPacket(data)) 
-        return
-    else if (timestampLastUpdate == 0) {
-        timestampLastUpdate = data.timestamp;
-        return;
-    } 
-
-    /* Otherwise ... */
-
-    // Update latest time
-    timestampLastUpdate = data.timestamp;
-    var stamp = data.timestamp;
-
-    var a = Chartkick.charts["accel"]
-    a.dataSource[0].data.push([stamp, data.acceleration.x])
-    a.dataSource[1].data.push([stamp, data.acceleration.y])
-    a.dataSource[2].data.push([stamp, data.acceleration.z])
-
-    var g = Chartkick.charts["gyro"]
-    g.dataSource[0].data.push([stamp, data.gyro.x])
-    g.dataSource[1].data.push([stamp, data.gyro.y])
-    g.dataSource[2].data.push([stamp, data.gyro.z])
-
-    var o = Chartkick.charts["orientation"]
-    o.dataSource[0].data.push([stamp, data.orientation.x])
-    o.dataSource[1].data.push([stamp, data.orientation.y])
-    o.dataSource[2].data.push([stamp, data.orientation.z])
-
-    var r = Chartkick.charts["rssi"]
-    r.dataSource.push([stamp, data.RSSI])
-
-    Chartkick.eachChart(function(chart) {
-        chart.refreshData()
-    })
 }
 
 function updateGeneralTelemetry(packet)

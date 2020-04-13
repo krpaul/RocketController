@@ -1,64 +1,54 @@
 <%= render partial: "navbar", locals: {active: "other"} %>
 <div class=page-body>
-    <div class="last-update">
-        <span class="under-value slightly-smaller">Last Update: <span class="slightly-smaller" id="last-update">0</span> s</span> 
-    </div>
     <div class=graph>
         <h2> Acceleration Graph </h2>
-        <%= line_chart [
-                {name: "X", data: formatTime(@relevantTelem.pluck(:created_at, :accelerationX)), color: "#f00"},
-                {name: "Y", data: formatTime(@relevantTelem.pluck(:created_at, :accelerationY)), color: "#06f"},
-                {name: "Z", data: formatTime(@relevantTelem.pluck(:created_at, :accelerationZ)), color: "#0f0"}
-            ], 
+        <%= line_chart "/get/accel",
             xtitle: "Time", ytitle: "m/s²",
             id: "accel", height: "40em",
             discrete: true,
-            library: @graphSettings
+            library: @graphSettings,
+            refresh: 5
         %>
     </div>
     <div class=graph>
         <h2> Gyro Graph </h2>
-        <%= line_chart [
-                {name: "X", data: formatTime(@relevantTelem.pluck(:created_at, :gyroX)), color: "#f00"},
-                {name: "Y", data: formatTime(@relevantTelem.pluck(:created_at, :gyroY)), color: "#06f"},
-                {name: "Z", data: formatTime(@relevantTelem.pluck(:created_at, :gyroZ)), color: "#0f0"}
-            ], 
+        <%= line_chart "/get/gyro",
             xtitle: "Time", ytitle: "°",
             id: "gyro", height: "40em",
             discrete: true,
-            library: @graphSettings
+            library: @graphSettings,
+            refresh: 5
         %>
     </div>
     <div class=graph>
         <h2> Orientation Graph </h2>
-        <%= line_chart [
-                {name: "X", data: formatTime(@relevantTelem.pluck(:created_at, :orientationX)), color: "#f00"},
-                {name: "Y", data: formatTime(@relevantTelem.pluck(:created_at, :orientationY)), color: "#06f"},
-                {name: "Z", data: formatTime(@relevantTelem.pluck(:created_at, :orientationZ)), color: "#0f0"}
-            ], 
+        <%= line_chart "/get/orientation",
             xtitle: "Time", ytitle: "(deg/s)",
             id: "orientation", height: "40em",
             discrete: true,
-            library: @graphSettings
+            library: @graphSettings,
+            refresh: 5
         %>
     </div>
     <div class=graph>
         <h2> RSSI Graph </h2>
-        <%= line_chart formatTime(@relevantTelem.pluck(:created_at, :rssi)), 
+        <%= line_chart "/get/rssi",
             xtitle: "Time", ytitle: "RSSI",
             id: "rssi",
             discrete: true,
-            library: @graphSettings
+            library: @graphSettings,
+            refresh: 5
         %>
     </div>
     <div class=graph>
         <h2> Altitude Graph </h2>
-        <%= line_chart formatTime(@relevantTelem.pluck(:created_at, :alt)), 
+        <%= line_chart "/get/alt",
             xtitle: "Time", ytitle: "m",
             colors: ["#f90"],
             id: "alt",
             discrete: true,
-            library: @graphSettings
+            library: @graphSettings,
+            refresh: 5
         %>
     </div>
 </div>

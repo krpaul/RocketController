@@ -50,12 +50,13 @@
 <div class="row">
     <div class="col-lg bordered small-padding">
         <span class="header blue">Altitude Graph <span class="no-data">!</span></span>
-        <%= line_chart formatTime(@altTelem),
+        <%= line_chart "/get/alt",
             xtitle: "Time", ytitle: "m",
             id: "alt",
             discrete: true,
-            library: {:xAxis => {:visible => false}},
-            width: "30vw", colors: ["blue"]
+            library: @graphSettings,
+            width: "30vw", colors: ["blue"],
+            refresh: 2
         %>
         <p class="small-note">For a more accurate visualization, consult the other telemtry tab</p>
     </div>

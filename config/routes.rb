@@ -5,6 +5,12 @@ Rails.application.routes.draw do
   get '/map', to: "index#map"
   
   get '/reset', to: "index#reset"
+
+  get '/get/alt', to: "graph#alt"
+  get '/get/accel', to: "graph#accel"
+  get '/get/gyro', to: "graph#gyro"
+  get '/get/orientation', to: "graph#orientation"
+  get '/get/rssi', to: "graph#rssi"
   
   post '/in', to: "posting#inData"
   post '/newFlight', to: "index#newFlight"
