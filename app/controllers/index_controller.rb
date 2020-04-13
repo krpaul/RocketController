@@ -1,19 +1,35 @@
 require 'net/http'
 require 'json'
 
+include IndexHelper
+
 class IndexController < ApplicationController
     $data = nil
 
+    $graphSettingsGlobal = {
+        :xAxis => {:visible => false},
+        :chart => {:animation => false},
+        :plotOptions => {
+            :series => {
+                :animation => {
+                    :duration => 0
+                }
+            }
+        },
+        :drilldown => {
+            :animation => {
+                :duration => 0
+            }
+        }
+    }
+
     def index 
-        @altTelem = getTelem().group_by_minute(:created_at).pluck(:created_at, :alt)
+        @graphSettings = $graphSettingsGlobal
     end
 
     def otherTelem
         @relevantTelem = getTelem
-        @graphSettings = {
-            :xAxis => {:visible => false},
-            :chart => {:animation => false}
-        }
+        @graphSettings = $graphSettingsGlobal
     end
 
     def configuration
@@ -21,6 +37,7 @@ class IndexController < ApplicationController
 
     def map
     end
+
 
     # gives latest data; will be requested by ajax
     def outData 
