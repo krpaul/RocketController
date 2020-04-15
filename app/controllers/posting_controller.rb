@@ -3,35 +3,40 @@ class PostingController < ApplicationController
     skip_before_action :verify_authenticity_token, except: [:create, :update, :destroy]
     
     def inData
+        # ensure data makes sense
+        if not params[:lat].between?(-90, 90) or not params[:lng].between?(-180, 180)
+            return render plain: "Malformed data: Lat or Lng in bad range\n"
+        end
+
         # save data in DB
-        t = Telemetry.new
+        t = Telemetry.new()
 
-        t.lat = params[:lat]
-        t.lng = params[:lng]
-        t.alt = params[:alt]
+        t.lat = params.require(:lat)
+        t.lng = params.require(:lng)
+        t.alt = params.require(:alt)
 
-        t.accelerationX = params[:acceleration][:x].to_f
-        t.accelerationY = params[:acceleration][:y].to_f
-        t.accelerationZ = params[:acceleration][:z].to_f
+        t.accelerationX = params.require(:acceleration).require(:x)
+        t.accelerationY = params.require(:acceleration).require(:y)
+        t.accelerationZ = params.require(:acceleration).require(:z)
 
-        t.gyroX = params[:gyro][:x].to_f
-        t.gyroY = params[:gyro][:y].to_f
-        t.gyroZ = params[:gyro][:z].to_f
+        t.gyroX = params.require(:gyro).require(:x)
+        t.gyroY = params.require(:gyro).require(:y)
+        t.gyroZ = params.require(:gyro).require(:z)
 
-        t.orientationX = params[:orientation][:x].to_f
-        t.orientationY = params[:orientation][:y].to_f
-        t.orientationZ = params[:orientation][:z].to_f
+        t.orientationX = params.require(:orientation).require(:x)
+        t.orientationY = params.require(:orientation).require(:y)
+        t.orientationZ = params.require(:orientation).require(:z)
 
-        t.calib_SYS = params[:calibration][:sys].to_i
-        t.calib_MAG = params[:calibration][:mag].to_i
-        t.calib_GYRO = params[:calibration][:gyro].to_i
-        t.calib_ACCEL = params[:calibration][:accel].to_i
+        t.calib_SYS = params.require(:calibration).require(:sys)
+        t.calib_MAG = params.require(:calibration).require(:mag)
+        t.calib_GYRO = params.require(:calibration).require(:gyro)
+        t.calib_ACCEL = params.require(:calibration).require(:accel)
 
-        t.RSSI = params[:RSSI].to_i
+        t.RSSI = params.require(:RSSI)
         t.lastNodeName = (params.has_key? :lastNodeName) ? params[:lastNodeName] : "Unknown"
 
-        t.receiver_lat = params[:receiver][:lat]
-        t.receiver_lng = params[:receiver][:lng]
+        t.receiver_lat = params.require(:receiver).require(:lat)
+        t.receiver_lng = params.require(:receiver).require(:lng)
         
         # set the flight to the last flight
         # if there isn't a last flight, create a default
