@@ -20,7 +20,8 @@ class IndexController < ApplicationController
             :animation => {
                 :duration => 0
             }
-        }
+        },
+        :defer => true
     }
 
     def index 
