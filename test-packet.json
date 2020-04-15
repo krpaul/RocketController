@@ -23,6 +23,10 @@
         "mag": 3,
         "accel": 2
     },
+    "receiver": {
+        "lat": 50.54,
+        "lng": -113.43
+    },
     "RSSI": -90,
     "lastNodeName": "Mobile Node"
 }

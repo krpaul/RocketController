@@ -1,3 +1,5 @@
+include IndexHelper
+
 class GraphController < ApplicationController
     def alt 
         return render json: formatTime(Flight.all.last.telemetries.group_by_minute(:created_at).pluck(:created_at, :alt))
