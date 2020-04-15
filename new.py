@@ -61,7 +61,7 @@ def main():
         print("sent data")
         print(response.text)
 
-        sleep(.2)
+        sleep(5)
 
 if __name__ == "__main__":
     main()

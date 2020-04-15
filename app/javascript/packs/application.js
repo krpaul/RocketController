@@ -2,8 +2,7 @@ require("@rails/ujs").start()
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
-
-require("chartkick").use(require("highcharts"))
+require("chartkick")//.use(require("highcharts"))
 require("chart.js")
 
 // Uncomment to copy all static images under ../images to the output folder and reference
@@ -37,9 +36,16 @@ let pageType;
 let currentFlight;
 let updateInterval;
 let dataCheck;
-
 document.addEventListener("turbolinks:load", function() { 
     currentFlight = getCookie("flight")
+
+    // window.addEventListener('error', (event) => {
+    //     log.textContent = log.textContent + `${event.type}: ${event.message}\n`;
+    //     console.log(event)
+    // });
+    Chartkick.eachChart( function(chart) {
+        chart.renderTo = chart.element.id;
+    });
 
     if (currentFlight != undefined && currentFlight != "")
         $("#flight-name")[0].innerText = currentFlight
@@ -50,7 +56,13 @@ document.addEventListener("turbolinks:load", function() {
     switch (pageType) {
 
     case "telemetry":
+        initialzeGeneralTelemetry()
+        break;
     case "mapPage": 
+        // Chartkick.eachChart( function(chart) {
+        //     console.log(chart)
+        //     chart.destroy()
+        // });
         initialzeGeneralTelemetry()
         break;
     case "other":
@@ -509,9 +521,7 @@ function setTimeSinceLastUpdate()
 }
 
 function updateTimeSinceLastUpdate()
-{
-    timer.innerText = String(parseInt(timer.innerText) + 1)
-}
+{ timer.innerText = String(parseInt(timer.innerText) + 1) }
 
 function resetTimeSinceLastUpdate()
 { 
@@ -580,7 +590,7 @@ function setElements()
     $("#reset-zoom").click(_resetZoom)
     $("#go-to-balloon").click(_goTo)
     
-    timer = $("#last-update")[0]
+    timer = $("#last-update")[0] 
 }
 
 function checkTime(i) 
