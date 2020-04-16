@@ -1,17 +1,18 @@
 Rails.application.routes.draw do
-  get '/telemetry', to: "index#index"
-  get '/telemetry/other', to: "index#otherTelem"
-  get '/configuration', to: "index#configuration"
-  get '/map', to: "index#map"
+  # Page endpoint
+  get ':flight_id/telemetry', to: "index#index"
+  get ':flight_id/telemetry/other', to: "index#otherTelem"
+  get ':flight_id/configuration', to: "index#configuration"
+  get ':flight_id/map', to: "index#map"
   
-  get '/reset', to: "index#reset"
-
-  get '/get/alt', to: "graph#alt"
-  get '/get/accel', to: "graph#accel"
-  get '/get/gyro', to: "graph#gyro"
-  get '/get/orientation', to: "graph#orientation"
-  get '/get/rssi', to: "graph#rssi"
+  # Graph endpoints
+  get 'get/alt/:flight_id', to: "graph#alt"
+  get 'get/accel/:flight_id', to: "graph#accel"
+  get 'get/gyro/:flight_id', to: "graph#gyro"
+  get 'get/orientation/:flight_id', to: "graph#orientation"
+  get 'get/rssi/:flight_id', to: "graph#rssi"
   
+  # AJAX Endpoitns
   post '/in', to: "posting#inData"
   post '/newFlight', to: "index#newFlight"
   post '/isFlight', to: "index#isFlight"
@@ -20,7 +21,7 @@ Rails.application.routes.draw do
   get '/out', to: "index#outData"
   get '/all', to: "index#allData"
 
+  # Other
   mount Lockup::Engine, at: '/lockup'
-
-  root 'index#index'
+  root 'index#route_me'
 end

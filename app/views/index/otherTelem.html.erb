@@ -5,58 +5,53 @@
     </div>
     <div class=graph>
         <h2> Acceleration Graph </h2>
-        <%= line_chart "/get/accel",
+        <%= line_chart "/get/accel/" + @f,
             xtitle: "Time", ytitle: "m/s²",
             id: "accel", height: "40em",
             discrete: true,
             library: @graphSettings,
             refresh: 5
-            #defer: true
         %>
     </div>
     <div class=graph>
         <h2> Gyro Graph </h2>
-        <%= line_chart "/get/gyro",
+        <%= line_chart "/get/gyro/" + @f,
             xtitle: "Time", ytitle: "°",
             id: "gyro", height: "40em",
             discrete: true,
             library: @graphSettings,
             refresh: 5
-            #defer: true
         %>
     </div>
     <div class=graph>
         <h2> Orientation Graph </h2>
-        <%= line_chart "/get/orientation",
+        <%= line_chart "/get/orientation/" + @f,
             xtitle: "Time", ytitle: "(deg/s)",
             id: "orientation", height: "40em",
             discrete: true,
             library: @graphSettings,
             refresh: 5
-            #defer: true
         %>
     </div>
     <div class=graph>
         <h2> RSSI Graph </h2>
-        <%= line_chart "/get/rssi",
+        <%= line_chart "/get/rssi/" + @f,
             xtitle: "Time", ytitle: "RSSI",
             id: "rssi",
             discrete: true,
             library: @graphSettings,
             refresh: 5
-            #defer: true
         %>
     </div>
     <div class=graph>
         <h2> Altitude Graph </h2>
-        <%= line_chart "/get/alt",
+        <%= line_chart "/get/alt/" + @f,
             xtitle: "Time", ytitle: "m",
             colors: ["#f90"],
             id: "alt",
             discrete: true,
             library: @graphSettings,
             refresh: 5
-            #defer: true
         %>
     </div>
 </div>

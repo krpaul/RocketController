@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
     def reconstructJSON(db_col)
         {
+            "flight_id" => db_col.id,
             "lat" => db_col.lat,
             "lng" => db_col.lng,
             "alt" => db_col.alt,

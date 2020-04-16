@@ -50,14 +50,13 @@
 <div class="row">
     <div class="col-lg bordered small-padding">
         <span class="header blue">Altitude Graph <span class="no-data">!</span></span>
-        <%= line_chart "/get/alt",
+        <%= line_chart "/get/alt/" + @f,
             xtitle: "Time", ytitle: "m",
             id: "alt",
             discrete: true,
             library: @graphSettings,
             width: "30vw", colors: ["blue"],
-            refresh: 2
-            # defer: true
+            refresh: 5
         %>
         <p class="small-note">For a more accurate visualization, consult the other telemtry tab</p>
     </div>

@@ -1,13 +1,16 @@
 <div class="title-box nav">
-    <h2><a id=<%= active %> class="switch <% if active == 'telemetry' %> active <% end %> " href="/telemetry">Telemetry</a></h2>
-    <h2><a id=<%= active %> class="switch <% if active == 'other' %> active <% end %> " href="/telemetry/other">Other Telemetry</a></h2>
-    <h2><a id=<%= active %> class="switch <% if active == 'mapPage' %> active <% end %> " href="/map">Map</a></h2>
-    <h2><a id=<%= active %> class="switch <% if active == 'config' %> active <% end %> " href="/configuration">Configuration</a></h2>
+    <h2><a id=<%= active %> class="switch <% if active == 'telemetry' %> active <% end %> " href="/<%= @f %>/telemetry">Telemetry</a></h2>
+    <h2><a id=<%= active %> class="switch <% if active == 'other' %> active <% end %> " href="/<%= @f %>/telemetry/other">Other Telemetry</a></h2>
+    <h2><a id=<%= active %> class="switch <% if active == 'mapPage' %> active <% end %> " href="/<%= @f %>/map">Map</a></h2>
+    <h2><a id=<%= active %> class="switch <% if active == 'config' %> active <% end %> " href="/<%= @f %>/configuration">Configuration</a></h2>
 </div>
 
 <div class="title-box navinfo" >
-    <h5>Current Flight: "<span id=flight-name><%= Flight.all.last.name %></span>"</h5>
+    <h5>Current Flight: "<span id=flight-name><%= Flight.find(@f.to_i).name %></span>"</h5>
     <h5>Date: <%= Date.today %></h5>
     <h5>Time: <span id="time"></span></h5>
     <hr />
 </div>
+
+<!-- This hidden span is for JS to know which flight we're on -->
+<span style="display: none" id="flight-id"><%= @f %></span>
