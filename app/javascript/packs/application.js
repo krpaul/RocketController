@@ -274,6 +274,7 @@ function checkDataUpdate(fn) {
         url: "/out",
         success: (data) => {
             // Make sure data is relevant
+            console.log(data, getFlight())
             if (data && data.flight_id == getFlight())
                 fn(data)
         },

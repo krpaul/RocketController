@@ -1,16 +1,16 @@
 Rails.application.routes.draw do
   # Page endpoint
-  get ':flight_id/telemetry', to: "index#index"
-  get ':flight_id/telemetry/other', to: "index#otherTelem"
-  get ':flight_id/configuration', to: "index#configuration"
-  get ':flight_id/map', to: "index#map"
+  get ':flight_id/telemetry', to: "index#index", :constraints => { :id => /[0-9|]+/ }
+  get ':flight_id/telemetry/other', to: "index#otherTelem", :constraints => { :id => /[0-9|]+/ }
+  get ':flight_id/configuration', to: "index#configuration", :constraints => { :id => /[0-9|]+/ }
+  get ':flight_id/map', to: "index#map", :constraints => { :id => /[0-9|]+/ }
   
   # Graph endpoints
-  get 'get/alt/:flight_id', to: "graph#alt"
-  get 'get/accel/:flight_id', to: "graph#accel"
-  get 'get/gyro/:flight_id', to: "graph#gyro"
-  get 'get/orientation/:flight_id', to: "graph#orientation"
-  get 'get/rssi/:flight_id', to: "graph#rssi"
+  get 'get/alt/:flight_id', to: "graph#alt", :constraints => { :id => /[0-9|]+/ }
+  get 'get/accel/:flight_id', to: "graph#accel", :constraints => { :id => /[0-9|]+/ }
+  get 'get/gyro/:flight_id', to: "graph#gyro", :constraints => { :id => /[0-9|]+/ }
+  get 'get/orientation/:flight_id', to: "graph#orientation", :constraints => { :id => /[0-9|]+/ }
+  get 'get/rssi/:flight_id', to: "graph#rssi", :constraints => { :id => /[0-9|]+/ }
   
   # AJAX Endpoitns
   post '/in', to: "posting#inData"
