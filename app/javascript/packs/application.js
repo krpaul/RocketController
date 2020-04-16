@@ -143,10 +143,6 @@ function _verifyPacket(data)
     else if (data.timestamp <= timestampLastUpdate) { 
         return false 
     } 
-    // not from this flight
-    else if (currentFlight != "" && data.flight != currentFlight) { 
-        return false 
-    }
     
     return true
 }
@@ -167,6 +163,7 @@ function newData(data)
     var lng = parseFloat(data.lng)
 
     // Add pair to lines
+    console.log("pushing... ")
     latlngPairs.push([lat, lng])
 
     // Add altitude
