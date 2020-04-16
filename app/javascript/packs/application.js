@@ -541,6 +541,14 @@ function _goTo()
     })
 }
 
+function _goToTracker()
+{
+    var pair = latlngPairs_tracker.last() || [0, 0];
+    map.jumpTo({
+        center:  [pair[1], pair[0]]
+    })
+}
+
 // Remove canvasJS credit
 function removeCredit()
 {
@@ -550,10 +558,11 @@ function removeCredit()
 
 function setElements()
 {
-    $("#reset-zoom").click(_resetZoom)
-    $("#go-to-balloon").click(_goTo)
+    $("#reset-zoom").click(_resetZoom);
+    $("#go-to-balloon").click(_goTo);
+    $("#go-to-tracker").click(_goToTracker);
     
-    timer = $("#last-update")[0] 
+    timer = $("#last-update")[0];
 }
 
 function checkTime(i) 
