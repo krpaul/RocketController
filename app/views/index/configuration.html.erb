@@ -12,5 +12,12 @@
     <button id=curr-flight class="btn btn-success">Show Current Flight Data</button>
     <br />
     <p class=note>Note: All incoming data will be appended to the latest created flight. Past flights are essentially read-only</p>
-    <button id=create-flight class="btn btn-lg btn-primary"> Create a new flight </button>
+    <button id=create-flight class="btn btn-lg btn-warning"> Create a new flight </button>
+
+    <div class=info>
+        <h4>About This Flight<h4>
+        <h6>Name: <%= Flight.find(@f).name %></h3>
+        <h6>Description: "<%= Flight.find(@f).desc %>"</h3>
+        <h6>Created On: <%= Flight.find(@f).created_at %></h3>
+    </div>
 </div>
