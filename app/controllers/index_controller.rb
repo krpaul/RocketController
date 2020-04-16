@@ -26,19 +26,25 @@ class IndexController < ApplicationController
 
     def index 
         @graphSettings = $graphSettingsGlobal
+        @f = params[:flight_id]
     end
 
     def otherTelem
-        @relevantTelem = getTelem
+        @f = params[:flight_id]
         @graphSettings = $graphSettingsGlobal
     end
 
     def configuration
+        @f = params[:flight_id]
     end
 
     def map
+        @f = params[:flight_id]
     end
 
+    def route_me
+        return redirect_to "/" + Flight.all.last.id.to_s + "/telemetry"
+    end
 
     # gives latest data; will be requested by ajax
     def outData 
@@ -53,13 +59,7 @@ class IndexController < ApplicationController
 
     # returns the whole database
     def allData
-        f = nil
-        if params[:flight] && params[:flight] != ""
-            f = Flight.where(:name == params[:flight])[0]
-        else
-            f = Flight.all.last
-        end
-        return render json: f.telemetries.map {|s| reconstructJSON s }
+        return render json: Flight.find(params[:flight]).telemetries.map {|s| reconstructJSON s }
     end
 
     # creates a new flight

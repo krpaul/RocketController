@@ -2,7 +2,7 @@ require("@rails/ujs").start()
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
-require("chartkick")//.use(require("highcharts"))
+require("chartkick")
 require("chart.js")
 
 // Uncomment to copy all static images under ../images to the output folder and reference
@@ -36,33 +36,15 @@ let pageType;
 let currentFlight;
 let updateInterval;
 let dataCheck;
+
+let redir = (loc) => {window.location.href = loc};
+
 document.addEventListener("turbolinks:load", function() { 
-    currentFlight = getCookie("flight")
-
-    // window.addEventListener('error', (event) => {
-    //     log.textContent = log.textContent + `${event.type}: ${event.message}\n`;
-    //     console.log(event)
-    // });
-    Chartkick.eachChart( function(chart) {
-        chart.renderTo = chart.element.id;
-    });
-
-    if (currentFlight != undefined && currentFlight != "")
-        $("#flight-name")[0].innerText = currentFlight
-    else 
-        currentFlight = "";
-
     pageType = $(".active")[0].id;
     switch (pageType) {
 
     case "telemetry":
-        initialzeGeneralTelemetry()
-        break;
     case "mapPage": 
-        // Chartkick.eachChart( function(chart) {
-        //     console.log(chart)
-        //     chart.destroy()
-        // });
         initialzeGeneralTelemetry()
         break;
     case "other":
@@ -96,6 +78,8 @@ document.addEventListener("turbolinks:load", function() {
                                     "desc": desc
                                 }
                             )
+
+                            redir("/")
                         }
                     }
                 },
@@ -103,17 +87,13 @@ document.addEventListener("turbolinks:load", function() {
         });
 
         $("#select-flight").click(() => {
-            currentFlight = $(".flight-select")[0].value;
-            setCookie("flight", currentFlight, 5)
-            $("#flight-name")[0].innerText = currentFlight
+            redir(`/${$(".flight-select").val()}/telemetry`)
         });
 
         $("#curr-flight").click(() => {
-            currentFlight = ""
-            setCookie("flight", currentFlight, 1)
-            location.reload()
-            return false
+            redir("/")
         });
+
         break;
     }  
 })
@@ -123,7 +103,7 @@ function initialzeGeneralTelemetry()
     // Get all data
     $.ajax({
         url: "/all",
-        data: { "flight": currentFlight },
+        data: { "flight": getFlight() },
         success: (data) => {
             if (data.length != 0) { startup(data); }
             else if (currentFlight == "") { // if no data availible, check for data every 5s (as long we're querying for the current flight)
@@ -131,7 +111,7 @@ function initialzeGeneralTelemetry()
                     () => {
                         $.ajax({
                             url: "/all",
-                            data: { "flight": currentFlight },
+                            data: { "flight": getFlight() },
                             success: (data) => {
                                 if (data.length != 0) {
                                     startup(data); 
@@ -153,7 +133,7 @@ function initialzeGeneralTelemetry()
     }) 
 }
 
-function verifyPacket(data)
+function _verifyPacket(data)
 {
     // undef
     if (!data || data == undefined) {
@@ -173,7 +153,7 @@ function verifyPacket(data)
 
 function newData(data) 
 {
-    if (!verifyPacket(data)) 
+    if (!_verifyPacket(data)) 
     { return }
 
     /* Otherwise ... */
@@ -289,10 +269,14 @@ function allData(data) // Fills in all data packets from /all request
     updateGeneralTelemetry(data.last())
 }
 
-function checkDataUpdate(fun) {
+function checkDataUpdate(fn) {
     $.ajax({
         url: "/out",
-        success: fun,
+        success: (data) => {
+            // Make sure data is relevant
+            if (data && data.flight_id == getFlight())
+                fn(data)
+        },
     })    
 }
 
@@ -514,6 +498,9 @@ function addMapLines()
     }
 }
             
+function getFlight()
+{ return $("#flight-id")[0].innerText }
+
 function setTimeSinceLastUpdate()
 {
     // Last time update (and remove mapbox credit)
@@ -529,34 +516,10 @@ function resetTimeSinceLastUpdate()
     timer.innerText = "0" 
 }
 
-
 function clearNoData()
 {
     $(".no-data").hide()
     clearInterval(noDataAlertTimer)
-}
-
-// https://www.w3schools.com/js/js_cookies.asp
-function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
-function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
 }
 
 /*******************
@@ -596,7 +559,7 @@ function setElements()
 function checkTime(i) 
 { return(i < 10) ? "0" + i : i; }
 
-export function startTime() 
+function startTime() 
 {
     var today = new Date(),
     h = checkTime(today.getHours()),
@@ -604,7 +567,6 @@ export function startTime()
     s = checkTime(today.getSeconds());
     
     document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
-    
     clockTimer = setTimeout(function () {
         startTime()
     }, 500);

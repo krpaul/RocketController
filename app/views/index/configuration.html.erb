@@ -4,7 +4,7 @@
     <label>Past Flight Data: </label>
     <select class="form-control flight-select">
         <% for fl in Flight.all.slice(0, Flight.all.length - 1) %>
-            <option><%= fl.name %></option>
+            <option value="<%= fl.id %>"><%= fl.name %></option>
         <% end %>
     </select>
     <br />
