@@ -125,6 +125,10 @@ body
     font-weight: 900;
     margin-left: 4px;
     display: none;
+
+    &.large {
+        font-size: 2em;
+    }
 }
 
 /**/
