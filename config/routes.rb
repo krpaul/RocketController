@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   post '/newFlight', to: "index#newFlight"
   post '/isFlight', to: "index#isFlight"
   post '/allFlightData', to: "index#getAllFlightData"
+  get '/lastUpdate/:flight_id', to: "index#lastUpdate"
 
   get '/out', to: "index#outData"
   get '/all', to: "index#allData"
