@@ -33,7 +33,6 @@ let noDataAlertTimer;
 let noDataHidden = false;
 let timestampLastUpdate = 0;
 let pageType;
-let currentFlight;
 let updateInterval;
 let dataCheck;
 
@@ -101,36 +100,31 @@ document.addEventListener("turbolinks:load", function() {
 function initialzeGeneralTelemetry()
 {
     // Get all data
-    $.ajax({
-        url: "/all",
-        data: { "flight": getFlight() },
-        success: (data) => {
+    queryInitalData(
+        (data) => {
+            console.log(data)
             if (data.length != 0) { startup(data); }
-            else if (currentFlight == "") { // if no data availible, check for data every 5s (as long we're querying for the current flight)
+            else { // if no data availible, check for data every 5s (as long we're querying for the current flight)
                 reCheckForData = window.setInterval(
-                    () => {
-                        $.ajax({
-                            url: "/all",
-                            data: { "flight": getFlight() },
-                            success: (data) => {
-                                if (data.length != 0) {
-                                    startup(data); 
-                                    clearInterval(reCheckForData);
-                                    clearNoData();
-                                }
+                    function() {
+                        queryInitalData((data) => {
+                            if (data.length != 0) {
+                                startup(data); 
+                                clearNoData();
                             }
                         })
                     }, 
-                    5000);
-                    
-                    // Set no data alerts
-                    noDataAlert()
+                    5000
+                );
+
+                // Set no data alerts
+                noDataAlert()
             }
 
             // other setup
             setup()
         },
-    }) 
+    )
 }
 
 function _verifyPacket(data)
@@ -163,7 +157,6 @@ function newData(data)
     var lng = parseFloat(data.lng)
 
     // Add pair to lines
-    console.log("pushing... ")
     latlngPairs.push([lat, lng])
 
     // Add altitude
@@ -238,6 +231,15 @@ function updateGeneralTelemetry(packet)
     }
 }
 
+function queryInitalData(fn)
+{
+    $.ajax({
+        url: "/all",
+        data: { "flight": getFlight() },
+        success: fn
+    })
+}
+
 function allData(data) // Fills in all data packets from /all request
 {
     if (!data)
@@ -271,7 +273,6 @@ function checkDataUpdate(fn) {
         url: "/out",
         success: (data) => {
             // Make sure data is relevant
-            console.log(data, getFlight())
             if (data && data.flight_id == getFlight())
                 fn(data)
         },
@@ -340,9 +341,6 @@ function setup()
 
     // time display
     startTime()
-
-    // incase it is still running 
-    clearInterval(reCheckForData)
 }
 
         
@@ -518,6 +516,7 @@ function clearNoData()
 {
     $(".no-data").hide()
     clearInterval(noDataAlertTimer)
+    clearInterval(reCheckForData)
 }
 
 /*******************

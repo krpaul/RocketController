@@ -53,7 +53,7 @@ class IndexController < ApplicationController
             return render json: $data
         else 
             puts "No content on request"
-            return
+            return render json: {}
         end
     end
 
