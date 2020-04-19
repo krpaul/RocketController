@@ -101,6 +101,10 @@ class IndexController < ApplicationController
         }
     end
 
+    def lastUpdate
+        return render json: (Time.now - Flight.find(params[:flight_id].to_i).telemetries.last.created_at).to_i
+    end
+
     private 
     def getTelem
         Flight.all.last.telemetries

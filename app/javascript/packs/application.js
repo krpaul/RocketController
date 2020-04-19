@@ -102,7 +102,6 @@ function initialzeGeneralTelemetry()
     // Get all data
     queryInitalData(
         (data) => {
-            console.log(data)
             if (data.length != 0) { startup(data); }
             else { // if no data availible, check for data every 5s (as long we're querying for the current flight)
                 reCheckForData = window.setInterval(
@@ -509,7 +508,12 @@ function updateTimeSinceLastUpdate()
 function resetTimeSinceLastUpdate()
 { 
     clearInterval(updateInterval);
-    timer.innerText = "0" 
+    $.ajax({
+        url: "/lastUpdate/" + getFlight(),
+        success: (lastupdate) => {
+            timer.innerText = String(lastupdate)
+        }
+    })
 }
 
 function clearNoData()
