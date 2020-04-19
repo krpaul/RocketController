@@ -192,3 +192,96 @@ body
 {
     margin-bottom: 3em;
 }
+
+.switch
+{
+    display: inline;
+    margin-right: 1.5em;
+    font-size: 0.9em;
+    &:hover
+    { 
+        text-decoration: underline !important; 
+        cursor: pointer;
+    }
+
+    &.active
+    {
+        color: red;
+        text-decoration: none;
+        &:hover
+        { 
+            text-decoration: none !important;
+            cursor: auto !important;
+        }
+    }
+}
+
+.page-body
+{margin-left: 1.75em;}
+
+.title-box
+{
+    margin-left: 1.75em;
+    margin-top: 0.75em;
+
+    hr {
+        color: white;
+        display: block;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: auto;
+        margin-right: auto;
+        border-style: inset;
+        border-width: 1px;
+    }
+
+    h5 {
+        display: inline;
+        margin-right: 1em;
+    }
+
+    .navinfo {
+        display: block;
+    }
+}
+
+.flight-select
+{ width: 20%; }
+
+.note
+{ margin-top: 2.5em; }
+
+
+.small-note
+{
+    font-size: 0.7em;
+    margin-top: 1em;
+    margin-bottom: 0;
+}
+
+.gpsheader
+{
+    margin-top: 2em;
+    padding-bottom: 0.5em;
+    border-bottom: 2px solid white;
+    width: 35%;
+}
+
+.map-group
+{
+    h5 {
+        margin-left: 1em;
+    }
+
+    display: inline-block;
+    margin-right: 2em;
+}
+
+.info
+{
+    margin-top: 2em;
+
+    h6 {
+        margin-left: 0.5em;
+    }
+}
