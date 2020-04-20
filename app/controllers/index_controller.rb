@@ -78,7 +78,6 @@ class IndexController < ApplicationController
     
     def getAllFlightData
         data = Flight.where(name: params[:flight])[0].telemetries
-        p "DATA:", data
         aData = [data.pluck(:created_at, :accelerationX),
                 data.pluck(:created_at, :accelerationY),
                 data.pluck(:created_at, :accelerationZ)]
