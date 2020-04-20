@@ -76,10 +76,9 @@ document.addEventListener("turbolinks:load", function() {
                                 {
                                     "name": flight,
                                     "desc": desc
-                                }
+                                },
+                                () => {redir("/")}
                             )
-
-                            redir("/")
                         }
                     }
                 },
