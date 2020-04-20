@@ -65,3 +65,4 @@ yarn-debug.log*
 /storage/*
 !/storage/.keep
 
+/db/production.sqlite3
