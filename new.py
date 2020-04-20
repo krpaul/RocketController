@@ -7,7 +7,8 @@ def rn():
     return randint(0, 10000) / 10000
 
 def main():
-    endpoint ="http://localhost:3000/in" #"http://208.118.126.178:8792/in"
+#    endpoint = "http://208.118.126.178:8792/in" 
+    endpoint = "http://localhost:3000/in"
     
     Lat = Lat1 = 51.13234
     Lng = Lng1 = -114.4243

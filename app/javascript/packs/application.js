@@ -43,7 +43,8 @@ document.addEventListener("turbolinks:load", function() {
     switch (pageType) {
 
     case "telemetry":
-    case "mapPage": 
+    case "mapPage":
+        latlngPairs = []; latlngPairs_tracker = []; // these like to duplicate themselves on new page loads from old ajax callbacks, so they have to be cleared.
         initialzeGeneralTelemetry()
         break;
     case "other":
@@ -439,6 +440,9 @@ function addMapLines()
     {
         /* add tracker info */
         var newLines_t = latlngPairs_tracker.map(x => [x[1], x[0]])  // flip lat/lng
+
+        console.log(newLines, newLines_t)
+        
         map.addSource('tracker', {
             'type': 'geojson',
             'data': {
