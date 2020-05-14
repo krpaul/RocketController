@@ -22,6 +22,9 @@ Rails.application.routes.draw do
   get '/out', to: "index#outData"
   get '/all', to: "index#allData"
 
+  # Imaging
+  post '/image', to: "posting#image"
+
   # Other
   mount Lockup::Engine, at: '/lockup'
   root 'index#route_me'
