@@ -55,4 +55,8 @@ class PostingController < ApplicationController
     
         return # return no content
     end
+
+    def image
+        
+    end
 end
