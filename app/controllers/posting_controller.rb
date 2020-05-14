@@ -57,6 +57,12 @@ class PostingController < ApplicationController
     end
 
     def image
-        
+        # Grab image
+        b64 = params.require(:base64)
+
+        # store in db
+        i = Image.new
+        i.base64 = b64
+        i.save!
     end
 end
