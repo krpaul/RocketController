@@ -32,6 +32,8 @@ let reCheckForData;
 let noDataAlertTimer; 
 let noDataHidden = false;
 let timestampLastUpdate = 0;
+let timestampLastImageUpdate;
+let timestampLastImageInterval;
 let pageType;
 let updateInterval;
 let dataCheck;
@@ -43,6 +45,14 @@ document.addEventListener("turbolinks:load", function() {
     switch (pageType) {
 
     case "telemetry":
+        latlngPairs = []; latlngPairs_tracker = []; // these like to duplicate themselves on new page loads from old ajax callbacks, so they have to be cleared.
+        initialzeGeneralTelemetry()
+
+        // init imaging updating
+        lastImageTimestamp((stamp) => {
+            timestampLastImageUpdate = stamp;
+            updateImageEvery(10);
+        })
     case "mapPage":
         latlngPairs = []; latlngPairs_tracker = []; // these like to duplicate themselves on new page loads from old ajax callbacks, so they have to be cleared.
         initialzeGeneralTelemetry()
@@ -342,6 +352,28 @@ function setup()
     startTime()
 }
 
+function lastImageTimestamp(fn)
+{
+    $.ajax({
+        url: "/getLastImage/time",
+        success: fn
+    }) 
+}
+
+function updateImageEvery(seconds)
+{
+    window.setInterval(
+        () => {
+            $.ajax({
+                url: "/getLastImage",
+                success: (data) => {
+
+                },
+            }) 
+        },
+        seconds
+    );
+}
         
 /*******************
     Utility Methods 
