@@ -62,7 +62,18 @@ class PostingController < ApplicationController
 
         # store in db
         i = Image.new
-        i.base64 = b64
+
+        i.base64 = b64 # set data
+        i.flight = Flight.all.last # set flight
+
         i.save!
+    end
+
+    def getLastImage
+        # return render json: {"base64": Image.where(flight)}
+    end
+
+    def getLastImage_time
+        return Image.where(flight: )
     end
 end
