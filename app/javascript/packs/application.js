@@ -54,24 +54,25 @@ document.addEventListener("turbolinks:load", function() {
     case "telemetry":
         latlngPairs = []; latlngPairs_tracker = []; // these like to duplicate themselves on new page loads from old ajax callbacks, so they have to be cleared.
         initialzeGeneralTelemetry()
-
+        
         // init imaging updating if imaging is enabled
         // lastImageTimestamp ajax request will fail if no images are in the db
+        imgtimer = $("#last-update-image")[0];
+        imgtimer_interval = window.setInterval(updateLastImageTimer, 1000)
         if (imagingEnabled())
         {
             lastImageTimestamp((stamp) => { 
                 timeLastImageUpdate = stamp;
-                updateImageEvery(10);
+                updateImageEvery(UPDATE_INTERVAL_MS);
+                resetLastImageTimer()
             })
         }
         else
         { 
             timeLastImageUpdate = 0
-            updateImageEvery(10); 
+            updateImageEvery(UPDATE_INTERVAL_MS); 
+            resetLastImageTimer()
         }
-
-        imgtimer = $("#last-update-image")[0];
-        imgtimer_interval = window.setInterval(updateLastImageTimer, 1000)
 
     case "mapPage":
         latlngPairs = []; latlngPairs_tracker = []; // these like to duplicate themselves on new page loads from old ajax callbacks, so they have to be cleared.
@@ -380,13 +381,12 @@ function lastImageTimestamp(fn)
     }) 
 }
 
-function updateImageEvery(seconds)
+function updateImageEvery(ms)
 {
     timeLastImageInterval = window.setInterval(
         () => {
             lastImageTimestamp(
                 (time) => {
-                    console.log(time, timeLastImageUpdate)
                     if (time > timeLastImageUpdate) // if image is new
                     {
                         // update it
@@ -396,16 +396,16 @@ function updateImageEvery(seconds)
                                 $("#video-stream")[0].setAttribute(
                                     'src', data.base64
                                 );
+
+                                timeLastImageUpdate = time;
+                                resetLastImageTimer()
                             },
                         }) 
-
-                        timeLastImageUpdate = time
                     }
                 }
             );
-            resetLastImageTimer();
         },
-        seconds * 1000
+        ms
     );
 }
         
@@ -506,8 +506,6 @@ function addMapLines()
         /* add tracker info */
         var newLines_t = latlngPairs_tracker.map(x => [x[1], x[0]])  // flip lat/lng
 
-        console.log(newLines, newLines_t)
-        
         map.addSource('tracker', {
             'type': 'geojson',
             'data': {
