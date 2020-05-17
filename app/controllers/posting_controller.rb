@@ -70,10 +70,10 @@ class PostingController < ApplicationController
     end
 
     def getLastImage
-        # return render json: {"base64": Image.where(flight)}
+        return render json: {"base64": Image.where(flight_id: params[:flight_id].to_i).last.base64}
     end
 
     def getLastImage_time
-        return Image.where(flight: )
+        return render json: {"time": Image.where(flight_id: params[:flight_id].to_i).last.created_at.to_i}
     end
 end

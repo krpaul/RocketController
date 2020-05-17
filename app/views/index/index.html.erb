@@ -25,7 +25,12 @@
     </div>
     <div class="col-lg bordered small-padding">
         <span class="header purple">Imaging</span>
-        <img id="video-stream" src="http://hd.wallpaperswide.com/thumbs/earth_sunrise_from_space-t2.jpg" />
+        <% if @imgs.length == 0 # no images %>
+            <img id="video-stream" src="/assets/nodata.jpg" />
+            <span id="no-image"></span> <!-- To let JS no there isn't an image -->
+        <% else # there is an image %>
+            <img id="video-stream" src="<%= @imgs.all.last.base64 %>" />
+        <% end %>
         
         <div class="last-update">
             <span class="under-value slightly-smaller">Last Update: <span class="slightly-smaller" id="last-update">0</span> s</span> 

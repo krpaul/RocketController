@@ -10,13 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_30_025924) do
+ActiveRecord::Schema.define(version: 2020999999999999) do
 
   create_table "flights", force: :cascade do |t|
     t.string "name"
     t.text "desc"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "images", force: :cascade do |t|
+    t.text "base64"
+    t.integer "flight_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["flight_id"], name: "index_images_on_flight_id"
   end
 
   create_table "telemetries", force: :cascade do |t|
@@ -46,6 +54,8 @@ ActiveRecord::Schema.define(version: 2020_03_30_025924) do
     t.index ["flight_id"], name: "index_telemetries_on_flight_id"
   end
 
+  add_foreign_key "images", "flights"
+  add_foreign_key "telemetries", "flights"
   add_foreign_key "telemetries", "flights"
   add_foreign_key "telemetries", "flights"
 end
