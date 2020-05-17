@@ -27,6 +27,8 @@ let altitudePoints = [];
 let latlngPairs = [];
 let latlngPairs_tracker = [];
 let timer;
+let imgtimer;
+let imgtimer_interval;
 let clockTimer;
 let reCheckForData;
 let noDataAlertTimer; 
@@ -46,8 +48,9 @@ document.addEventListener("turbolinks:load", function() {
     // sometimes window.intervals stick, so just remove them to be safe
     clearInterval(noDataAlertTimer)
     clearInterval(timeLastImageInterval)
-    switch (pageType) {
+    clearInterval(imgtimer_interval)
 
+    switch (pageType) {
     case "telemetry":
         latlngPairs = []; latlngPairs_tracker = []; // these like to duplicate themselves on new page loads from old ajax callbacks, so they have to be cleared.
         initialzeGeneralTelemetry()
@@ -66,6 +69,9 @@ document.addEventListener("turbolinks:load", function() {
             timeLastImageUpdate = 0
             updateImageEvery(10); 
         }
+
+        imgtimer = $("#last-update-image")[0];
+        imgtimer_interval = window.setInterval(updateLastImageTimer, 1000)
 
     case "mapPage":
         latlngPairs = []; latlngPairs_tracker = []; // these like to duplicate themselves on new page loads from old ajax callbacks, so they have to be cleared.
@@ -396,7 +402,8 @@ function updateImageEvery(seconds)
                         timeLastImageUpdate = time
                     }
                 }
-            )
+            );
+            resetLastImageTimer();
         },
         seconds * 1000
     );
@@ -580,6 +587,12 @@ function resetTimeSinceLastUpdate()
         }
     })
 }
+
+function updateLastImageTimer()
+{ imgtimer.innerText = String(parseInt(imgtimer.innerText) + 1) }
+
+function resetLastImageTimer()
+{ imgtimer.innerText = timeLastImageUpdate != 0 ? Math.trunc(Date.now() / 1000 - timeLastImageUpdate) : "0"}
 
 function clearNoData()
 {
