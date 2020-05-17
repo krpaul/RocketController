@@ -27,6 +27,8 @@ class IndexController < ApplicationController
     def index 
         @graphSettings = $graphSettingsGlobal
         @f = params[:flight_id]
+
+        @imgs = Image.where(flight_id: params[:flight_id].to_i)
     end
 
     def otherTelem

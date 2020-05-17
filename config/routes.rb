@@ -23,9 +23,9 @@ Rails.application.routes.draw do
   get '/all', to: "index#allData"
 
   # Imaging
-  post ':flight_id/image', to: "posting#image", :constraints => { :flight_id => /[0-9|]+/ }
-  get ':flight_id/getLastImage', to: "posting#image", :constraints => { :flight_id => /[0-9|]+/ }
-  get ':flight_id/getLastImage/time', to: "posting#image_time", :constraints => { :flight_id => /[0-9|]+/ }
+  post '/image', to: "posting#image"
+  get ':flight_id/getLastImage', to: "posting#getLastImage", :constraints => { :flight_id => /[0-9|]+/ }
+  get ':flight_id/getLastImage/time', to: "posting#getLastImage_time", :constraints => { :flight_id => /[0-9|]+/ }
 
   # Other
   mount Lockup::Engine, at: '/lockup'

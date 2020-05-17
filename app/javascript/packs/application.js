@@ -32,8 +32,8 @@ let reCheckForData;
 let noDataAlertTimer; 
 let noDataHidden = false;
 let timestampLastUpdate = 0;
-let timestampLastImageUpdate;
-let timestampLastImageInterval;
+let timeLastImageUpdate;
+let timeLastImageInterval;
 let pageType;
 let updateInterval;
 let dataCheck;
@@ -42,17 +42,31 @@ let redir = (loc) => {window.location.href = loc};
 
 document.addEventListener("turbolinks:load", function() { 
     pageType = $(".active")[0].id;
+
+    // sometimes window.intervals stick, so just remove them to be safe
+    clearInterval(noDataAlertTimer)
+    clearInterval(timeLastImageInterval)
     switch (pageType) {
 
     case "telemetry":
         latlngPairs = []; latlngPairs_tracker = []; // these like to duplicate themselves on new page loads from old ajax callbacks, so they have to be cleared.
         initialzeGeneralTelemetry()
 
-        // init imaging updating
-        lastImageTimestamp((stamp) => {
-            timestampLastImageUpdate = stamp;
-            updateImageEvery(10);
-        })
+        // init imaging updating if imaging is enabled
+        // lastImageTimestamp ajax request will fail if no images are in the db
+        if (imagingEnabled())
+        {
+            lastImageTimestamp((stamp) => { 
+                timeLastImageUpdate = stamp;
+                updateImageEvery(10);
+            })
+        }
+        else
+        { 
+            timeLastImageUpdate = 0
+            updateImageEvery(10); 
+        }
+
     case "mapPage":
         latlngPairs = []; latlngPairs_tracker = []; // these like to duplicate themselves on new page loads from old ajax callbacks, so they have to be cleared.
         initialzeGeneralTelemetry()
@@ -355,23 +369,36 @@ function setup()
 function lastImageTimestamp(fn)
 {
     $.ajax({
-        url: "/getLastImage/time",
-        success: fn
+        url: "/" + getFlight() + "/getLastImage/time",
+        success: (d) => fn(d.time)
     }) 
 }
 
 function updateImageEvery(seconds)
 {
-    window.setInterval(
+    timeLastImageInterval = window.setInterval(
         () => {
-            $.ajax({
-                url: "/getLastImage",
-                success: (data) => {
+            lastImageTimestamp(
+                (time) => {
+                    console.log(time, timeLastImageUpdate)
+                    if (time > timeLastImageUpdate) // if image is new
+                    {
+                        // update it
+                        $.ajax({                
+                            url: "/" + getFlight() + "/getLastImage",
+                            success: (data) => {
+                                $("#video-stream")[0].setAttribute(
+                                    'src', data.base64
+                                );
+                            },
+                        }) 
 
-                },
-            }) 
+                        timeLastImageUpdate = time
+                    }
+                }
+            )
         },
-        seconds
+        seconds * 1000
     );
 }
         
@@ -530,6 +557,9 @@ function addMapLines()
             
 function getFlight()
 { return $("#flight-id")[0].innerText }
+
+function imagingEnabled()
+{ return $("#no-image").length == 0 }
 
 function setTimeSinceLastUpdate()
 {
