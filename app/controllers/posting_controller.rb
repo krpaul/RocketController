@@ -74,6 +74,13 @@ class PostingController < ApplicationController
     end
 
     def getLastImage_time
-        return render json: {"time": Image.where(flight_id: params[:flight_id].to_i).last.created_at.to_i}
+        img = Image.where(flight_id: params[:flight_id].to_i)
+
+        if img.length != 0 
+            return render json: {"time": img.last.created_at.to_i}
+        else
+            return render json: {}
+        end
+
     end
 end
