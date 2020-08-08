@@ -20,12 +20,6 @@ class ApplicationController < ActionController::Base
                 "x" => db_col.gyroX,
                 "z" => db_col.gyroZ
             },
-            "calibration" => {
-                "sys" => db_col.calib_SYS,
-                "accel" => db_col.calib_ACCEL,
-                "gyro" => db_col.calib_GYRO,
-                "mag" => db_col.calib_MAG,
-            },
             "RSSI": db_col.RSSI,
             "lastNodeName": db_col.lastNodeName,
             "receiver" => {

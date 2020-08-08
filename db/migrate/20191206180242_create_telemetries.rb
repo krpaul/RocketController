@@ -17,11 +17,6 @@ class CreateTelemetries < ActiveRecord::Migration[6.0]
       t.float :orientationY
       t.float :orientationZ
       
-      t.integer :calib_SYS
-      t.integer :calib_MAG
-      t.integer :calib_GYRO
-      t.integer :calib_ACCEL
-      
       t.integer :RSSI
       t.string  :lastNodeName
       
