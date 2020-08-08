@@ -4,7 +4,7 @@ class PostingController < ApplicationController
     
     def inData
         # ensure data makes sense
-        if not params[:lat].between?(-90, 90) or not params[:lng].between?(-180, 180)
+        if not params[:lat].to_f.between?(-90, 90) or not params[:lng].to_f.between?(-180, 180)
             return render plain: "Malformed data: Lat or Lng in bad range\n"
         end
 
