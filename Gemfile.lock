@@ -90,6 +90,10 @@ GEM
       activesupport (>= 4.2.0)
     groupdate (5.0.0)
       activesupport (>= 5)
+    hermitage (0.0.7)
+      coffee-rails
+      jquery-rails
+      rails (>= 3.2)
     i18n (1.7.0)
       concurrent-ruby (~> 1.0)
     jbuilder (2.9.1)
@@ -113,6 +117,7 @@ GEM
       mimemagic (~> 0.3.2)
     method_source (0.9.2)
     mimemagic (0.3.3)
+    mini_magick (4.10.1)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.13.0)
@@ -225,10 +230,12 @@ DEPENDENCIES
   coffee-rails
   ejs
   groupdate
+  hermitage
   jbuilder (~> 2.7)
   jquery-rails
   listen (>= 3.0.5, < 3.2)
   lockup
+  mini_magick
   puma (~> 3.11)
   rails (~> 6.0.0)
   sass-rails (~> 5)

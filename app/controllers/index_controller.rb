@@ -44,6 +44,11 @@ class IndexController < ApplicationController
         @f = params[:flight_id]
     end
 
+    def images
+        @f = params[:flight_id]
+        @images = Image.where(flight_id: @f)
+    end
+
     def route_me
         return redirect_to "/" + Flight.all.last.id.to_s + "/telemetry"
     end

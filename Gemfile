@@ -60,3 +60,5 @@ gem 'jquery-rails'
 gem 'lockup'
 gem "chartkick"
 gem 'groupdate'
+gem 'hermitage'
+gem "mini_magick"

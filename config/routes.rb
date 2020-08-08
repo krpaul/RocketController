@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get ':flight_id/telemetry/other', to: "index#otherTelem", :constraints => { :flight_id => /[0-9|]+/ }
   get ':flight_id/configuration', to: "index#configuration", :constraints => { :flight_id => /[0-9|]+/ }
   get ':flight_id/map', to: "index#map", :constraints => { :flight_id => /[0-9|]+/ }
+  get ':flight_id/images', to: "index#images", :constraints => { :flight_id => /[0-9|]+/ }
   
   # Graph endpoints
   get 'get/alt/:flight_id', to: "graph#alt", :constraints => { :flight_id => /[0-9|]+/ }
