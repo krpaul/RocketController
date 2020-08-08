@@ -249,12 +249,6 @@ function updateGeneralTelemetry(packet)
         $("#gyro-y")[0].innerText = packet.gyro.y
         $("#gyro-z")[0].innerText = packet.gyro.z
     
-        // update calib
-        $("#calib-sys")[0].innerText = packet.calibration.sys
-        $("#calib-mag")[0].innerText = packet.calibration.mag
-        $("#calib-gyro")[0].innerText = packet.calibration.gyro
-        $("#calib-accel")[0].innerText = packet.calibration.accel
-    
         // transmission info
         $("#last-node")[0].innerText = packet.lastNodeName
         $("#last-rssi")[0].innerText = packet.RSSI
