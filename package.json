@@ -2,10 +2,12 @@
   "name": "RocketController",
   "private": true,
   "dependencies": {
+    "@mithi/bare-minimum-3d": "^0.1.4",
     "@rails/actioncable": "^6.0.0-alpha",
     "@rails/activestorage": "^6.0.0-alpha",
     "@rails/ujs": "^6.0.0-alpha",
     "@rails/webpacker": "^5.2.1",
+    "bare-minimum-2d": "^0.2.0",
     "chart.js": "^2.9.3",
     "chartkick": "^3.2.0",
     "highcharts": "^8.0.4",
