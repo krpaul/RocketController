@@ -7,8 +7,6 @@ Hermitage.configure :images do
     }
 
     thumbnail -> img { 
-        img_obj = MiniMagick::Image.read(Base64.decode64(img.base64[METADATA.size..-1]))
-        img_obj.resize "200x150"
-        return METADATA + Base64.encode64(img_obj.to_blob).to_s
+        img.base64_thumbnail
     }
 end

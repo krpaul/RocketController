@@ -1,3 +1,5 @@
+require 'mini_magick'
+
 class PostingController < ApplicationController
     skip_before_action :check_for_lockup, raise: false
     skip_before_action :verify_authenticity_token, except: [:create, :update, :destroy]
@@ -53,6 +55,8 @@ class PostingController < ApplicationController
     end
 
     def image
+        METADATA = "data:image/jpeg;base64,"
+
         # Grab image
         b64 = params.require(:base64)
 
@@ -60,6 +64,12 @@ class PostingController < ApplicationController
         i = Image.new
 
         i.base64 = b64 # set data
+
+        # resize a thumbnail
+        img_obj = MiniMagick::Image.read(Base64.decode64(b64[METADATA.size..-1]))
+        img_obj.resize "200x150"
+        i.base64_thumbnail = METADATA + Base64.encode64(img_obj.to_blob).to_s
+        
         i.flight = Flight.all.last # set flight
 
         i.save!
