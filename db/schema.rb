@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 2020999999999999) do
 
   create_table "images", force: :cascade do |t|
     t.text "base64"
+    t.text "base64_thumbnail"
     t.integer "flight_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -31,19 +32,21 @@ ActiveRecord::Schema.define(version: 2020999999999999) do
     t.float "lat"
     t.float "lng"
     t.float "alt"
+    t.float "temp"
+    t.float "humidity"
+    t.float "pressure"
     t.float "accelerationX"
     t.float "accelerationY"
     t.float "accelerationZ"
     t.float "gyroX"
     t.float "gyroY"
     t.float "gyroZ"
-    t.float "orientationX"
-    t.float "orientationY"
-    t.float "orientationZ"
-    t.integer "calib_SYS"
-    t.integer "calib_MAG"
-    t.integer "calib_GYRO"
-    t.integer "calib_ACCEL"
+    t.float "magX"
+    t.float "magY"
+    t.float "magZ"
+    t.float "angleY"
+    t.float "angleX"
+    t.float "angleZ"
     t.integer "RSSI"
     t.string "lastNodeName"
     t.float "receiver_lat"
@@ -55,7 +58,6 @@ ActiveRecord::Schema.define(version: 2020999999999999) do
   end
 
   add_foreign_key "images", "flights"
-  add_foreign_key "telemetries", "flights"
   add_foreign_key "telemetries", "flights"
   add_foreign_key "telemetries", "flights"
 end

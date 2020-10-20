@@ -34,11 +34,15 @@ class PostingController < ApplicationController
         t.magY = params.require(:mag).require(:y)
         t.magZ = params.require(:mag).require(:z)
 
+        t.angleX = params.require(:angle).require(:x)
+        t.angleY = params.require(:angle).require(:y)
+        t.angleZ = params.require(:angle).require(:z)
+
         t.RSSI = (params.has_key? :lastNodeName) ? params[:lastNodeName] : 0
         t.lastNodeName = (params.has_key? :lastNodeName) ? params[:lastNodeName] : "Unknown"
 
-        t.receiver_lat = (params.has_key? :lastNodeName) ? params.[:receiver][:lat] : 51.151908 # school's lat/lng as fallback
-        t.receiver_lng = (params.has_key? :lastNodeName) ? params.[:receiver][:lng] : -114.203129
+        t.receiver_lat = (params.has_key? :lastNodeName) ? params[:receiver][:lat] : 51.151908 # school's lat/lng as fallback
+        t.receiver_lng = (params.has_key? :lastNodeName) ? params[:receiver][:lng] : -114.203129
         
         # set the flight to the last flight
         # if there isn't a last flight, create a default
@@ -59,7 +63,7 @@ class PostingController < ApplicationController
     end
 
     def image
-        METADATA = "data:image/jpeg;base64,"
+        metadata = "data:image/jpeg;base64,"
 
         # Grab image
         b64 = params.require(:base64)
@@ -70,9 +74,9 @@ class PostingController < ApplicationController
         i.base64 = b64 # set data
 
         # resize a thumbnail
-        img_obj = MiniMagick::Image.read(Base64.decode64(b64[METADATA.size..-1]))
+        img_obj = MiniMagick::Image.read(Base64.decode64(b64[metadata.size..-1]))
         img_obj.resize "200x150"
-        i.base64_thumbnail = METADATA + Base64.encode64(img_obj.to_blob).to_s
+        i.base64_thumbnail = metadata + Base64.encode64(img_obj.to_blob).to_s
         
         i.flight = Flight.all.last # set flight
 

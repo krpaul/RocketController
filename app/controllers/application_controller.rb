@@ -5,20 +5,28 @@ class ApplicationController < ActionController::Base
             "lat" => db_col.lat,
             "lng" => db_col.lng,
             "alt" => db_col.alt,
+            "temp" => db_col.temp,
+            "humidity" => db_col.humidity,
+            "pressure" => db_col.pressure,
             "acceleration" => {
                 "x" => db_col.accelerationX,
                 "y" => db_col.accelerationY,
                 "z" => db_col.accelerationZ
             },
-            "orientation" => {
-                "x" => db_col.orientationX,
-                "y" => db_col.orientationY,
-                "z" => db_col.orientationZ
+            "mag" => {
+                "x" => db_col.magX,
+                "y" => db_col.magY,
+                "z" => db_col.magZ
             },
             "gyro" => {
                 "y" => db_col.gyroY,
                 "x" => db_col.gyroX,
                 "z" => db_col.gyroZ
+            },
+            "angle" => {
+                "y" => db_col.angleY,
+                "x" => db_col.angleX,
+                "z" => db_col.angleZ
             },
             "RSSI": db_col.RSSI,
             "lastNodeName": db_col.lastNodeName,

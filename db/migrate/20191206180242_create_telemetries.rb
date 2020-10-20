@@ -21,6 +21,10 @@ class CreateTelemetries < ActiveRecord::Migration[6.0]
       t.float :magY
       t.float :magZ
       
+      t.float :angleY
+      t.float :angleX
+      t.float :angleZ
+      
       t.integer :RSSI
       t.string  :lastNodeName
       
