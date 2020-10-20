@@ -240,9 +240,9 @@ function updateGeneralTelemetry(packet)
         $("#accel-z")[0].innerText = packet.acceleration.z
         
         // update orientation
-        $("#orient-x")[0].innerText = packet.orientation.x
-        $("#orient-y")[0].innerText = packet.orientation.y
-        $("#orient-z")[0].innerText = packet.orientation.z
+        $("#mag-x")[0].innerText = packet.mag.x
+        $("#mag-y")[0].innerText = packet.mag.y
+        $("#mag-z")[0].innerText = packet.mag.z
         
         // update gryo
         $("#gyro-x")[0].innerText = packet.gyro.x
@@ -252,6 +252,16 @@ function updateGeneralTelemetry(packet)
         // transmission info
         $("#last-node")[0].innerText = packet.lastNodeName
         $("#last-rssi")[0].innerText = packet.RSSI
+        
+        // angle info
+        $("#ang-x")[0].innerText = packet.angle.x
+        $("#ang-y")[0].innerText = packet.angle.y
+        $("#ang-z")[0].innerText = packet.angle.z
+
+        // env info
+        $("#temp")[0].innerText = packet.temp
+        $("#pressure")[0].innerText = packet.pressure
+        $("#humidity")[0].innerText = packet.humidity
     }
 }
 

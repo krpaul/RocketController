@@ -11,10 +11,10 @@
             <h5>Z: <span id="accel-z">~</span> (m/s&sup2;)</h5>
         </div>
         <div class="vector-group">
-            <h4>Orientation</h4>
-            <h5>X: <span id="orient-x">~</span> &deg;</h5>
-            <h5>Y: <span id="orient-y">~</span> &deg;</h5>
-            <h5>Z: <span id="orient-z">~</span> &deg;</h5>
+            <h4>Magnetic</h4>
+            <h5>X: <span id="mag-x">~</span> gauss</h5>
+            <h5>Y: <span id="mag-y">~</span> gauss</h5>
+            <h5>Z: <span id="mag-z">~</span> gauss</h5>
         </div>
         <div class="vector-group">
             <h4>Gyroscopic</h4>
@@ -80,11 +80,23 @@
         <button class="authorize-button btn-primary btn-lg btn-block">Authorize</button>
     </div>
     <div class="col-lg bordered small-padding">
-        <span class="header yellow">Other</span>
+        <span class="header yellow">Other Readings</span>
         <div class="vector-group">
             <h5> Transmission Info </h5>
             <h6>Last Node: <span id="last-node">~</span></h6>
             <h6>Last RSSI: <span id="last-rssi">~</span></h6>
+        </div>
+        <div class="vector-group">
+            <h5> Angle Info </h5>
+            <h6>X: <span id="ang-x">~</span>&deg;</h6>
+            <h6>Y: <span id="ang-y">~</span>&deg;</h6>
+            <h6>Z: <span id="ang-z">~</span>&deg;</h6>
+        </div>
+        <div class="vector-group">
+            <h5> Environment Info </h5>
+            <h6>Temperature: <span id="temp">~</span>&deg;C</h6>
+            <h6>Pressure: <span id="pressure">~</span> hPa</h6>
+            <h6>Humidity: <span id="humidity">~</span> %</h6>
         </div>
     </div>
 </div>

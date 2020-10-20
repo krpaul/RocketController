@@ -18,6 +18,10 @@ class PostingController < ApplicationController
             return render plain: "Malformed data: Lat or Lng in bad range\n"
         end
 
+        t.temp = params.require(:temp)
+        t.humidity = params.require(:humidity)
+        t.pressure = params.require(:pressure)
+
         t.accelerationX = params.require(:acceleration).require(:x)
         t.accelerationY = params.require(:acceleration).require(:y)
         t.accelerationZ = params.require(:acceleration).require(:z)
@@ -26,15 +30,15 @@ class PostingController < ApplicationController
         t.gyroY = params.require(:gyro).require(:y)
         t.gyroZ = params.require(:gyro).require(:z)
 
-        t.orientationX = params.require(:orientation).require(:x)
-        t.orientationY = params.require(:orientation).require(:y)
-        t.orientationZ = params.require(:orientation).require(:z)
+        t.magX = params.require(:mag).require(:x)
+        t.magY = params.require(:mag).require(:y)
+        t.magZ = params.require(:mag).require(:z)
 
-        t.RSSI = params.require(:RSSI)
+        t.RSSI = (params.has_key? :lastNodeName) ? params[:lastNodeName] : 0
         t.lastNodeName = (params.has_key? :lastNodeName) ? params[:lastNodeName] : "Unknown"
 
-        t.receiver_lat = params.require(:receiver).require(:lat)
-        t.receiver_lng = params.require(:receiver).require(:lng)
+        t.receiver_lat = (params.has_key? :lastNodeName) ? params.[:receiver][:lat] : 51.151908 # school's lat/lng as fallback
+        t.receiver_lng = (params.has_key? :lastNodeName) ? params.[:receiver][:lng] : -114.203129
         
         # set the flight to the last flight
         # if there isn't a last flight, create a default

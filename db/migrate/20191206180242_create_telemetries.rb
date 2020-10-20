@@ -4,6 +4,10 @@ class CreateTelemetries < ActiveRecord::Migration[6.0]
       t.float :lat
       t.float :lng
       t.float :alt
+
+      t.float :temp
+      t.float :humidity
+      t.float :pressure
       
       t.float :accelerationX
       t.float :accelerationY
@@ -13,9 +17,9 @@ class CreateTelemetries < ActiveRecord::Migration[6.0]
       t.float :gyroY
       t.float :gyroZ
       
-      t.float :orientationX
-      t.float :orientationY
-      t.float :orientationZ
+      t.float :magX
+      t.float :magY
+      t.float :magZ
       
       t.integer :RSSI
       t.string  :lastNodeName
