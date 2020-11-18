@@ -5,55 +5,73 @@ class PostingController < ApplicationController
     skip_before_action :verify_authenticity_token, except: [:create, :update, :destroy]
     
     def inData
-        
-        # save data in DB
-        t = Telemetry.new()
-        
-        t.lat = params.require(:lat)
-        t.lng = params.require(:lng)
-        t.alt = params.require(:alt)
-        
-        # ensure data makes sense
-        if not params[:lat].to_f.between?(-90, 90) or not params[:lng].to_f.between?(-180, 180)
-            return render plain: "Malformed data: Lat or Lng in bad range\n"
+        # if this is an SF10 (true) or SF8 (false) packet
+        critical = false
+
+        data_ttn = params.require(:payload_fields)
+
+        if (data_ttn[:gps_0][:latitude].present? && 
+            data_ttn[:gps_0][:longitude].present? && 
+            data_ttn[:gps_0][:altitude].present?)
+            critical = true
         end
 
-        t.temp = params.require(:temp)
-        t.humidity = params.require(:humidity)
-        t.pressure = params.require(:pressure)
+        def isCritical(t)
+            t.lat = data_ttn[:lat]
+            t.lng = data_ttn[:lng]
+            t.alt = data_ttn[:alt]
 
-        t.accelerationX = params.require(:acceleration).require(:x)
-        t.accelerationY = params.require(:acceleration).require(:y)
-        t.accelerationZ = params.require(:acceleration).require(:z)
-
-        t.gyroX = params.require(:gyro).require(:x)
-        t.gyroY = params.require(:gyro).require(:y)
-        t.gyroZ = params.require(:gyro).require(:z)
-
-        t.magX = params.require(:mag).require(:x)
-        t.magY = params.require(:mag).require(:y)
-        t.magZ = params.require(:mag).require(:z)
-
-        t.angleX = params.require(:angle).require(:x)
-        t.angleY = params.require(:angle).require(:y)
-        t.angleZ = params.require(:angle).require(:z)
-
-        t.RSSI = (params.has_key? :lastNodeName) ? params[:lastNodeName] : 0
-        t.lastNodeName = (params.has_key? :lastNodeName) ? params[:lastNodeName] : "Unknown"
-
-        t.receiver_lat = (params.has_key? :lastNodeName) ? params[:receiver][:lat] : 51.151908 # school's lat/lng as fallback
-        t.receiver_lng = (params.has_key? :lastNodeName) ? params[:receiver][:lng] : -114.203129
-        
-        # set the flight to the last flight
-        # if there isn't a last flight, create a default
-        if Flight.all.length == 0
-            f = Flight.new
-            f.name = "Default Flight"
-            f.desc = ""
-            f.save!
+            # ensure data makes sense
+            if not data_ttn[:lat].to_f.between?(-90, 90) or not data_ttn[:lng].to_f.between?(-180, 180)
+                return render plain: "Malformed data: Lat or Lng in bad range\n"
+            end
         end
-        t.flight = Flight.all.last
         
+
+        def isntCritical(t)
+            t.temp = params.require(:temp)
+            t.humidity = params.require(:humidity)
+            t.pressure = params.require(:pressure)
+
+            t.accelerationX = params.require(:acceleration).require(:x)
+            t.accelerationY = params.require(:acceleration).require(:y)
+            t.accelerationZ = params.require(:acceleration).require(:z)
+
+            t.gyroX = params.require(:gyro).require(:x)
+            t.gyroY = params.require(:gyro).require(:y)
+            t.gyroZ = params.require(:gyro).require(:z)
+
+            t.magX = params.require(:mag).require(:x)
+            t.magY = params.require(:mag).require(:y)
+            t.magZ = params.require(:mag).require(:z)
+
+            t.angleX = params.require(:angle).require(:x)
+            t.angleY = params.require(:angle).require(:y)
+            t.angleZ = params.require(:angle).require(:z)
+
+            t.RSSI = (params.has_key? :lastNodeName) ? data_ttn[:lastNodeName] : 0
+            t.lastNodeName = (params.has_key? :lastNodeName) ? data_ttn[:lastNodeName] : "Unknown"
+
+            t.receiver_lat = (params.has_key? :lastNodeName) ? data_ttn[:receiver][:lat] : 51.151908 # school's lat/lng as fallback
+            t.receiver_lng = (params.has_key? :lastNodeName) ? data_ttn[:receiver][:lng] : -114.203129
+        end
+
+        t = nil
+        if is_complete? $lastRow 
+            t = Telemetry.new
+            # set the flight to the last flight
+            t.flight = Flight.all.last
+            $lastRow = t
+        else
+            t = $lastRow
+        end
+
+        if critical
+            isCritical(t)
+        else
+            isntCritical(t)
+        end
+
         t.save!
         
         # set the global data var json

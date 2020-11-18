@@ -40,4 +40,13 @@ class ApplicationController < ActionController::Base
             "tstamp-formatted" => db_col.created_at.to_s
         }
     end
+
+    def is_complete?(model)
+        whitelist = %w[ id created_at updated_at ]
+      
+        not model.attributes.any? do |attr, val|
+            whitelist.exclude?(attr) && (val.nil? || val == [] || val == [""])
+        end
+    end
+      
 end
