@@ -4,56 +4,58 @@ class PostingController < ApplicationController
     skip_before_action :check_for_lockup, raise: false
     skip_before_action :verify_authenticity_token, except: [:create, :update, :destroy]
     
+    $lastRow = Telemetry.all.last
+
     def inData
         # if this is an SF10 (true) or SF8 (false) packet
         critical = false
 
-        data_ttn = params.require(:payload_fields)
+        $data_ttn = params.require(:payload_fields)
 
-        if (data_ttn[:gps_0][:latitude].present? && 
-            data_ttn[:gps_0][:longitude].present? && 
-            data_ttn[:gps_0][:altitude].present?)
+        puts $data_ttn.inspect
+
+        if ($data_ttn.has_key? :gps_0)
             critical = true
         end
 
         def isCritical(t)
-            t.lat = data_ttn[:lat]
-            t.lng = data_ttn[:lng]
-            t.alt = data_ttn[:alt]
+            t.lat = $data_ttn.require(:gps_0).require(:latitude)
+            t.lng = $data_ttn.require(:gps_0).require(:longitude)
+            t.alt = $data_ttn.require(:gps_0).require(:altitude)
 
             # ensure data makes sense
-            if not data_ttn[:lat].to_f.between?(-90, 90) or not data_ttn[:lng].to_f.between?(-180, 180)
+            if not $data_ttn[:lat].to_f.between?(-90, 90) or not $data_ttn[:lng].to_f.between?(-180, 180)
                 return render plain: "Malformed data: Lat or Lng in bad range\n"
             end
         end
         
 
         def isntCritical(t)
-            t.temp = params.require(:temp)
-            t.humidity = params.require(:humidity)
-            t.pressure = params.require(:pressure)
+            t.pressure = $data_ttn.require(:barometric_pressure_1)
+            t.temp = $data_ttn.require(:barometric_pressure_2)
+            t.humidity = $data_ttn.require(:barometric_pressure_3)
 
-            t.accelerationX = params.require(:acceleration).require(:x)
-            t.accelerationY = params.require(:acceleration).require(:y)
-            t.accelerationZ = params.require(:acceleration).require(:z)
+            t.accelerationX = $data_ttn.require(:accelerometer_0).require(:x)
+            t.accelerationY = $data_ttn.require(:accelerometer_0).require(:y)
+            t.accelerationZ = $data_ttn.require(:accelerometer_0).require(:z)
 
-            t.gyroX = params.require(:gyro).require(:x)
-            t.gyroY = params.require(:gyro).require(:y)
-            t.gyroZ = params.require(:gyro).require(:z)
+            t.gyroX = $data_ttn.require(:gyrometer_0).require(:x)
+            t.gyroY = $data_ttn.require(:gyrometer_0).require(:y)
+            t.gyroZ = $data_ttn.require(:gyrometer_0).require(:z)
 
-            t.magX = params.require(:mag).require(:x)
-            t.magY = params.require(:mag).require(:y)
-            t.magZ = params.require(:mag).require(:z)
+            t.magX = $data_ttn.require(:analog_in_1)
+            t.magY = $data_ttn.require(:analog_in_2)
+            t.magZ = $data_ttn.require(:analog_in_3)
 
-            t.angleX = params.require(:angle).require(:x)
-            t.angleY = params.require(:angle).require(:y)
-            t.angleZ = params.require(:angle).require(:z)
+            t.angleX = $data_ttn.require(:analog_in_4)
+            t.angleY = $data_ttn.require(:analog_in_5)
+            t.angleZ = $data_ttn.require(:analog_in_6)
 
-            t.RSSI = (params.has_key? :lastNodeName) ? data_ttn[:lastNodeName] : 0
-            t.lastNodeName = (params.has_key? :lastNodeName) ? data_ttn[:lastNodeName] : "Unknown"
+            t.RSSI = ($data_ttn.has_key? :lastNodeName) ? $data_ttn[:lastNodeName] : 0
+            t.lastNodeName = ($data_ttn.has_key? :lastNodeName) ? $data_ttn[:lastNodeName] : "Unknown"
 
-            t.receiver_lat = (params.has_key? :lastNodeName) ? data_ttn[:receiver][:lat] : 51.151908 # school's lat/lng as fallback
-            t.receiver_lng = (params.has_key? :lastNodeName) ? data_ttn[:receiver][:lng] : -114.203129
+            t.receiver_lat = ($data_ttn.has_key? :lastNodeName) ? $data_ttn[:receiver][:lat] : 51.151908 # school's lat/lng as fallback
+            t.receiver_lng = ($data_ttn.has_key? :lastNodeName) ? $data_ttn[:receiver][:lng] : -114.203129
         end
 
         t = nil

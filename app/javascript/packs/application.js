@@ -177,7 +177,7 @@ function newData(data)
     { return }
 
     /* Otherwise ... */
-
+    
     // Update latest time
     timestampLastUpdate = data.timestamp
 
@@ -186,11 +186,18 @@ function newData(data)
     var lat = parseFloat(data.lat)
     var lng = parseFloat(data.lng)
 
-    // Add pair to lines
-    latlngPairs.push([lat, lng])
+    // Add pair to lines making sure they're not 0
+    if (lat != 0 && lng != 0) { 
+        latlngPairs.push([lat, lng]) 
+        setGPSLockStatus(true)
+    }
+    else {
+        setGPSLockStatus(false)
+    }
 
-    // Add altitude
-    altitudePoints.push(alt)
+    // Add altitude making sure it's not 0
+    if (alt != 0) 
+    { altitudePoints.push(alt) }
     
     // general telem
     updateGeneralTelemetry(data)
@@ -217,6 +224,18 @@ function newData(data)
         map.jumpTo({
             center: [lng, lat]
         })
+}
+
+function setGPSLockStatus(hasLock)
+{
+    if (hasLock)
+    {
+        $("#has-lock").text("yes")
+    }
+    else
+    {
+        $("#has-lock").text("no")
+    }
 }
 
 function updateGeneralTelemetry(packet)
@@ -450,7 +469,7 @@ function addMapLines()
     }
     
     /* add balloon info */
-    var newLines = latlngPairs.map(x => [x[1], x[0]])  // flip lat/lng
+    var newLines = latlngPairs.filter(x => x[0] != 0 && x[1] != 0).map(x => [x[1], x[0]])  // flip lat/lng
     
     // point
     map.addSource('balloon', {

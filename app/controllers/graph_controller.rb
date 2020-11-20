@@ -2,7 +2,7 @@ include IndexHelper
 
 class GraphController < ApplicationController
     def alt 
-        return render json: telem(:alt, params[:flight_id])
+        return render json: telem(:alt, params[:flight_id]).select { |item| item[1] != 0 }
     end
 
     def accel
@@ -23,9 +23,9 @@ class GraphController < ApplicationController
 
     def orientation
         return render json: [
-            {name: "X", data: telem(:orientationX, params[:flight_id]), color: "#f00"},
-            {name: "Y", data: telem(:orientationY, params[:flight_id]), color: "#06f"},
-            {name: "Z", data: telem(:orientationZ, params[:flight_id]), color: "#0f0"}
+            {name: "X", data: telem(:angleX, params[:flight_id]), color: "#f00"},
+            {name: "Y", data: telem(:angleY, params[:flight_id]), color: "#06f"},
+            {name: "Z", data: telem(:angleZ, params[:flight_id]), color: "#0f0"}
         ]
     end
 
