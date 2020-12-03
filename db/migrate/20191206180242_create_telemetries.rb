@@ -1,6 +1,9 @@
 class CreateTelemetries < ActiveRecord::Migration[6.0]
   def change
     create_table :telemetries do |t|
+      t.float :temp
+      t.float :humidity
+      t.float :pressure
       t.float :lat
       t.float :lng
       t.float :alt
