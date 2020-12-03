@@ -108,7 +108,8 @@ class IndexController < ApplicationController
     end
 
     def lastUpdate
-        return render json: (Time.now - Flight.find(params[:flight_id].to_i).telemetries.last.created_at).to_i
+	f = Flight.find(params[:flight_id].to_i)
+	return render json: f.telemetries.count > 0 ? (Time.now - f.telemetries.last.created_at).to_i : 0
     end
 
     private 
