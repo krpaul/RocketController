@@ -59,7 +59,7 @@ class PostingController < ApplicationController
         end
 
         t = nil
-        if is_complete? $lastRow 
+	if (Flight.all.last.telemetries.count ==  0) or is_complete? $lastRow 
             t = Telemetry.new
             # set the flight to the last flight
             t.flight = Flight.all.last
@@ -111,7 +111,7 @@ class PostingController < ApplicationController
         img = Image.where(flight_id: params[:flight_id].to_i)
 
         if img.length != 0 
-            return render json: {"time": img.last.created_at.to_i}
+            return render json: {"time": img.last.updated_at.to_i}
         else
             return render json: {}
         end
