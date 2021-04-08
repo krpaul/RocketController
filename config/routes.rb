@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   get 'get/alt/:flight_id', to: "graph#alt", :constraints => { :flight_id => /[0-9|]+/ }
   get 'get/accel/:flight_id', to: "graph#accel", :constraints => { :flight_id => /[0-9|]+/ }
   get 'get/gyro/:flight_id', to: "graph#gyro", :constraints => { :flight_id => /[0-9|]+/ }
-  get 'get/orientation/:flight_id', to: "graph#orientation", :constraints => { :flight_id => /[0-9|]+/ }
+  get 'get/mag/:flight_id', to: "graph#mag", :constraints => { :flight_id => /[0-9|]+/ }
   get 'get/rssi/:flight_id', to: "graph#rssi", :constraints => { :flight_id => /[0-9|]+/ }
   
   # AJAX Endpoitns

@@ -1,9 +1,6 @@
 class CreateTelemetries < ActiveRecord::Migration[6.0]
   def change
     create_table :telemetries do |t|
-      t.float :temp
-      t.float :humidity
-      t.float :pressure
       t.float :lat
       t.float :lng
       t.float :alt
@@ -24,9 +21,10 @@ class CreateTelemetries < ActiveRecord::Migration[6.0]
       t.float :magY
       t.float :magZ
       
-      t.float :angleY
-      t.float :angleX
-      t.float :angleZ
+      t.float :calibrationSys
+      t.float :calibrationGyro
+      t.float :calibrationMag
+      t.float :calibrationAccel
       
       t.integer :RSSI
       t.string  :lastNodeName

@@ -21,11 +21,11 @@ class GraphController < ApplicationController
         ]
     end
 
-    def orientation
+    def mag
         return render json: [
-            {name: "X", data: telem(:angleX, params[:flight_id]), color: "#f00"},
-            {name: "Y", data: telem(:angleY, params[:flight_id]), color: "#06f"},
-            {name: "Z", data: telem(:angleZ, params[:flight_id]), color: "#0f0"}
+            {name: "X", data: telem(:magX, params[:flight_id]), color: "#f00"},
+            {name: "Y", data: telem(:magY, params[:flight_id]), color: "#06f"},
+            {name: "Z", data: telem(:magZ, params[:flight_id]), color: "#0f0"}
         ]
     end
 

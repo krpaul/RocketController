@@ -271,11 +271,6 @@ function updateGeneralTelemetry(packet)
         // transmission info
         $("#last-node")[0].innerText = packet.lastNodeName
         $("#last-rssi")[0].innerText = packet.RSSI
-        
-        // angle info
-        $("#ang-x")[0].innerText = packet.angle.x
-        $("#ang-y")[0].innerText = packet.angle.y
-        $("#ang-z")[0].innerText = packet.angle.z
 
         // env info
         $("#temp")[0].innerText = packet.temp

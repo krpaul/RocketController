@@ -24,10 +24,10 @@
         %>
     </div>
     <div class=graph>
-        <h2> Orientation Graph </h2>
-        <%= line_chart "/get/orientation/" + @f,
+        <h2> Magnetic Graph </h2>
+        <%= line_chart "/get/mag/" + @f,
             xtitle: "Time", ytitle: "(deg/s)",
-            id: "orientation", height: "40em",
+            id: "mag", height: "40em",
             discrete: true,
             library: @graphSettings,
             refresh: 5

@@ -2,6 +2,9 @@
     "lat": 57.34423,
     "lng": -122.63245,
     "alt": 2000,
+    "temp": 21,
+    "humidity": 10,
+    "pressure": 101,
     "acceleration": {
         "x": 9,
         "y": 19,
@@ -15,7 +18,7 @@
     "gyro": {
         "x": 5,
         "y": 2.3,
-        "z": 2.3
+        "z": 2.5
     },
     "calibration": {
         "sys": 2,
